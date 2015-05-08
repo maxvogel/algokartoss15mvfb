@@ -3,6 +3,14 @@ from osgeo import ogr
 
 
 class GML(object):
+    """
+    Attributes
+    ----------
+
+    index : list
+    linesX,linesY : list of lists; every list is a path
+    pointsX,pointsY : list x/y coordinates
+    """
 
     def __init__(self):
         self.index = []
