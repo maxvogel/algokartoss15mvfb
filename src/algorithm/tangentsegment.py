@@ -52,13 +52,13 @@ def minMaxTangent(C, i, j):
 
     if dotvj_pre * dotvj_post > 0:  # same sign
         #vij is tangent
-        if C[j-1][1] < C[j][1]:
+        if C[j-1][y] < C[j][y]:
             return 1
         else:
             return 0
     return -1
 
-def intersect(a,b,c,d):
+def intersectionPoint(a,b,c,d):
     """
     returns intersection point of line ab and cd
     """
@@ -69,11 +69,29 @@ def intersect(a,b,c,d):
 
     return [Sx,Sy]
 
+def counterClockwise(a,b,c):
+    return (c[y]-a[y])*(b[x]-a[x]) > (b[y]-a[y])*(c[x]-a[x])
+
+def intersect(a,b,c,d):
+    """
+    returns true if line segments ab and cd intersect
+    """
+    return counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
+           counterClockwise(a,b,c) != counterClockwise(a,b,d)
+
+
 def computeTangentSplitters(C,i):
     """
     """
-    """""
     for j in range(i+1,len(C)+1):
         if minMaxTangent(C,i,j) == 1:
             k = j-1
-    """""
+            lij = [C[i], C[j]+100*(C[j]-C[i])]
+            while not intersect(lij[0],lij[1],C[k-1],C[k]):
+                k = k-1
+                if minMaxTangent(C,i,k) == 1:
+                    pass
+                else:
+                    k = k-1
+            w = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
+            #TODO
