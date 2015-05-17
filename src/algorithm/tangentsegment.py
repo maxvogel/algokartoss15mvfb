@@ -88,9 +88,11 @@ def intersect(a,b,c,d):
 def computeTangentSplitters(C,i):
     """
     """
-    w = [] # w = [j, point]
+    w_max = [] # w = [j, point]
+    w_min = []
 
     for j in range(i+1,len(C)):
+
         if minMaxTangent(C,i,j) == 1:
             k = j-1
             lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
@@ -100,5 +102,18 @@ def computeTangentSplitters(C,i):
                     pass         #TODO
                 else:
                     k = k-1
-            w.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
-    return w
+            w_max.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+
+        elif minMaxTangent(C,i,j) == 0:
+            k = j-1
+            lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
+            while not intersect(lij[0],lij[1],C[k-1],C[k]):
+                k = k-1
+                if minMaxTangent(C,i,k) == 0:
+                    pass         #TODO
+                else:
+                    k = k-1
+            w_min.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+
+
+    return w_max, w_min
