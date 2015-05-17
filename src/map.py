@@ -31,6 +31,7 @@ polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2]
 C = zip(*polygonalChain)
 
 print minMaxTangent(polygonalChain,0,7)
+print computeTangentSplitters(polygonalChain,0)
 
 
 plt.plot(C[0], C[1])

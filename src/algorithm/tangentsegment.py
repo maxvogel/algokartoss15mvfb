@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 x = 0; y = 1
 
 def angle(vec1, vec2):
@@ -9,13 +10,11 @@ def angle(vec1, vec2):
     norm_v2 = np.linalg.norm(vec2)
     return math.acos(dotp/(norm_v1*norm_v2))
 
-
 def getPrincipalAngle(C):
     # C = [[x,y], [], [] .... ]
     start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
     xaxis = [1,0]
     return angle(start_end_line,xaxis)
-
 
 def rotate(C, angle):
     """
@@ -31,7 +30,6 @@ def rotate(C, angle):
     newC = zip(*newC)
     return newC
 
-
 def minMaxTangent(C, i, j):
     """
     returns
@@ -39,8 +37,14 @@ def minMaxTangent(C, i, j):
     1  if vivj is maximal tangent
    -1  else
     """
-    dx = C[j][0]-C[i][0]
-    dy = C[j][1]-C[i][1]
+    if j == len(C)-1:  # special case: last vertex is always max or min
+        if C[j-1][y] < C[j][y]:
+            return 1
+        else:
+            return 0
+
+    dx = C[j][x]-C[i][x]
+    dy = C[j][y]-C[i][y]
     normal_vec = [-dy,dx]
 
     dotvj_pre  = np.dot(normal_vec,C[j-1])
@@ -62,9 +66,11 @@ def intersectionPoint(a,b,c,d):
     """
     returns intersection point of line ab and cd
     """
-    Sx = ((a[x]*b[y]-c[x]-d[x])-(a[x]-b[x])*(c[x]*d[y]-c[y]-d[x]))/ \
+    a = map(float,a)
+
+    Sx = ((a[x]*b[y]-a[y]*b[x])*(c[x]-d[x])-(a[x]-b[x])*(c[x]*d[y]-c[y]*d[x]))/ \
     ((a[x]-b[x])*(c[y]-d[y])-(a[y]-b[y])*(c[x]-d[x]))
-    Sy = ((a[x]*b[y]-c[y]-d[y])-(a[y]-b[y])*(c[x]*d[y]-c[y]-d[x]))/ \
+    Sy = ((a[x]*b[y]-a[y]*b[x])*(c[y]-d[y])-(a[y]-b[y])*(c[x]*d[y]-c[y]*d[x]))/ \
     ((a[x]-b[x])*(c[y]-d[y])-(a[y]-b[y])*(c[x]-d[x]))
 
     return [Sx,Sy]
@@ -79,19 +85,20 @@ def intersect(a,b,c,d):
     return counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
            counterClockwise(a,b,c) != counterClockwise(a,b,d)
 
-
 def computeTangentSplitters(C,i):
     """
     """
-    for j in range(i+1,len(C)+1):
+    w = [] # w = [j, point]
+
+    for j in range(i+1,len(C)):
         if minMaxTangent(C,i,j) == 1:
             k = j-1
-            lij = [C[i], C[j]+100*(C[j]-C[i])]
+            lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
                 k = k-1
                 if minMaxTangent(C,i,k) == 1:
-                    pass
+                    pass         #TODO
                 else:
                     k = k-1
-            w = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
-            #TODO
+            w.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+    return w
