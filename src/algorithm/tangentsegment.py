@@ -1,7 +1,6 @@
 import math
 import numpy as np
 
-
 x = 0; y = 1
 
 def angle(vec1, vec2):
@@ -87,6 +86,17 @@ def intersect(a,b,c,d):
 
 def computeTangentSplitters(C,i):
     """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+         polygonal chain with n vertices
+    i : int
+         1 <= i <= n
+
+    Returns
+    -------
+    tangent splitters of C with respect to vertex i
+
     """
     w_max = [] # w = [j, point]
     w_min = []
@@ -102,7 +112,7 @@ def computeTangentSplitters(C,i):
                     pass         #TODO
                 else:
                     k = k-1
-            w_max.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+            w_max.append([C[j], intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
 
         elif minMaxTangent(C,i,j) == 0:
             k = j-1
@@ -113,7 +123,7 @@ def computeTangentSplitters(C,i):
                     pass         #TODO
                 else:
                     k = k-1
-            w_min.append([j, intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+            w_min.append([C[j], intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
 
 
     return w_max, w_min

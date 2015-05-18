@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+from matplotlib import collections  as mc
 from parser.gml import GML
 from map.draw import drawMap
 from algorithm.tangentsegment import *
 import numpy as np
+
+
 
 gml = GML()
 gml.getLines("../data/lines_out.txt")
@@ -30,9 +33,12 @@ for i in range(0,len(gml.linesX)):
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
 C = zip(*polygonalChain)
 
-print minMaxTangent(polygonalChain,0,7)
-print computeTangentSplitters(polygonalChain,0)
+#print minMaxTangent(polygonalChain,0,7)
+w_max, w_min = computeTangentSplitters(polygonalChain,0)
 
+tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
+fig, ax = plt.subplots()
+ax.add_collection(tangentSplitters)
 
 plt.plot(C[0], C[1])
 plt.show()
