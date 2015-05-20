@@ -4,34 +4,65 @@ import numpy as np
 x = 0; y = 1
 
 def angle(vec1, vec2):
+
     dotp  = np.dot(vec1,vec2)
     norm_v1 = np.linalg.norm(vec1)
     norm_v2 = np.linalg.norm(vec2)
     return math.acos(dotp/(norm_v1*norm_v2))
 
 def getPrincipalAngle(C):
-    # C = [[x,y], [], [] .... ]
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal Chain
+
+    Returns
+    -------
+    the angle between start_end_line (first to last vertex)
+    and the x-axis
+    """
     start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
     xaxis = [1,0]
     return angle(start_end_line,xaxis)
 
 def rotate(C, angle):
     """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal Chain
+    angle : float
+        angle in radians
+
+    Returns
+    -------
+    the rotated polygonal chain
     """
     rotationMatrix = [[math.cos(angle), -math.sin(angle)],
                       [math.sin(angle),  math.cos(angle)]]
 
-    newC = []
+    rotatedC = []
     for vertex in C:
         rotate = np.dot(rotationMatrix, vertex)
         newC.append(rotate)
 
-    newC = zip(*newC)
-    return newC
+    rotatedC = zip(*newC)
+    return rotatedC
 
 def minMaxTangent(C, i, j):
     """
-    returns
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal Chain
+    i : int
+        vertex vi
+    j : int
+        vertex vj
+
+    Returns
+    -------
     0  if vivj is minimal tangent
     1  if vivj is maximal tangent
    -1  else
@@ -63,7 +94,14 @@ def minMaxTangent(C, i, j):
 
 def intersectionPoint(a,b,c,d):
     """
-    returns intersection point of line ab and cd
+    Parameters
+    ----------
+    a b c d : list
+        x/y coordinates
+
+    Returns
+    -------
+    intersection point of line ab and cd
     """
     a = map(float,a)
 
@@ -79,7 +117,9 @@ def counterClockwise(a,b,c):
 
 def intersect(a,b,c,d):
     """
-    returns true if line segments ab and cd intersect
+    Returns
+    -------
+    true if line segments ab and cd intersect
     """
     return counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
            counterClockwise(a,b,c) != counterClockwise(a,b,d)
@@ -89,9 +129,9 @@ def computeTangentSplitters(C,i):
     Parameters
     ----------
     C : list of x/y coordinates
-         polygonal chain with n vertices
+        polygonal chain with n vertices
     i : int
-         1 <= i <= n
+        1 <= i <= n
 
     Returns
     -------
