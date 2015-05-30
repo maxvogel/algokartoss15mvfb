@@ -4,9 +4,8 @@ from parser.gml import GML
 from map.draw import drawMap
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
+from algorithm.discard_accept import *
 import numpy as np
-
-
 
 gml = GML()
 gml.getLines("../data/lines_out.txt")
@@ -37,10 +36,15 @@ P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[80,0],[90,5],[5
 Ps = zip(*P)
 
 #print minMaxTangent(polygonalChain,0,7)
-w_max, w_min = computeTangentSplitters(polygonalChain,0)
+w_max, w_min, face = computeTangentSplitters(polygonalChain,0)
 
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
 distributedPoints = distributePoints(None,0,P,polygonalChain)
+
+print face
+
+
+
 fig, ax = plt.subplots()
 ax.add_collection(tangentSplitters)
 pX = []

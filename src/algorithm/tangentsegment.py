@@ -136,14 +136,17 @@ def computeTangentSplitters(C,i):
     Returns
     -------
     tangent splitters of C with respect to vertex i
-
+    and the corresponding faces
     """
-    w_max = [] # w = [j, point]
+    w_max = []
     w_min = []
+    face  = []
+    v_y = 0
 
     for j in range(i+1,len(C)):
 
         if minMaxTangent(C,i,j) == 1:
+            v_y = j
             k = j-1
             lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
@@ -152,9 +155,13 @@ def computeTangentSplitters(C,i):
                     pass         #TODO
                 else:
                     k = k-1
-            w_max.append([C[j], intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+            interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
+            w_max.append([C[j], interP])
+
+            face.append([interP] + C[k:v_y+1])
 
         elif minMaxTangent(C,i,j) == 0:
+            v_y = j
             k = j-1
             lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
@@ -163,7 +170,9 @@ def computeTangentSplitters(C,i):
                     pass         #TODO
                 else:
                     k = k-1
-            w_min.append([C[j], intersectionPoint(lij[0],lij[1],C[k-1],C[k])])
+            interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
+            w_min.append([C[j], interP])
 
+            face.append([interP] + C[k:v_y+1])
 
-    return w_max, w_min
+    return w_max, w_min, face
