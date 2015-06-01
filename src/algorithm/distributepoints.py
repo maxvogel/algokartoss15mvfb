@@ -1,18 +1,19 @@
 import math
 import numpy as np
 from tangentsegment import angle, intersect
+from util.planargeometry import *
 import Queue
 
 def distributePoints(Si, i, P, C):
-	print(P)
+	#print(P)
 	Pdash = [p for p in P if p[0] > C[i][0]]
-	print(Pdash)
+	#print(Pdash)
 	Pdash += C[i+1:]
-	print(Pdash)
+	#print(Pdash)
 	#for p in Pdash:
 	#	print(angle([C[i][0],C[i][1]+1],p))
 	Pdash.sort(key=lambda x: angle([C[i][0],C[i][1]+10],[x[0]-C[i][0],x[1]-C[i][1]]))
-	print("the queue is:\t{0}".format(Pdash))
+	#print("the queue is:\t{0}".format(Pdash))
 	#T binary search tree
 	T = []
 	distributedPoints = [[] for x in C]
@@ -44,31 +45,45 @@ def dotProduct(a,b):
 	return line[0]*point[1]-line[1]*point[0]
 
 def debugPoints(p):
-	if p in [[37,28],[10,7],[51,19]]:
+	lO = [[37,28],[10,7],[51,19]]
+	lTw = [[37,28],[70,-7],[40,-7]]
+	lTh = [[87,13],[20,8],[53,-5],[59,-7]]
+	if p in lTh:
 		return True
 	return False
 
 def findLeftMostEdgeRightOfP(T,p,Ci):
-	#print(Ci)
 	sweepline = getSweepLine(Ci,p)
-	#print(sweepline)
+	#if debugPoints(p):
+		#print("checking point:\t{0}".format(p))
+		#print("\tT:\t{0}".format(T))
+		#print("\tsweepline:\t{0}".format(sweepline))		
+	toDelete = []
+	result = None
 	found = False
 	i = 0
-	#print(T)
-	if debugPoints(p):
-		print("T:\t{0}".format(T))
-		print("sweepline:\t{0}".format(sweepline))
 	while not found and i < len(T):
-		dotp  = dotProduct(sweepline,T[i][0])
-		dotp2  = dotProduct(sweepline,T[i][1])
-		if debugPoints(p):
-			print("\tedge:\t{0}".format(T[i]))
-			print("dotProducts:\t{0},{1}".format(dotp,dotp2))
-		#print("{2}:\t{0}\t{1}".format(dotp, dotp2,type(dotp)))
-		#if intersect(sweepline[0],sweepline[1],T[i][0],T[i][1]):
-		if dotp < 0 and dotp2 < 0:
-			found = True
-			return T[i]
+		#if debugPoints(p): print("\ttesting edge:\t{0}".format(T[i]))
+		if intersect(sweepline[0],sweepline[1],T[i][0],T[i][1]):
+			intersection = intersectionPoint(sweepline[0],sweepline[1],T[i][0],T[i][1])
+			#if debugPoints(p):
+				#print("\tedge:\t{0}".format(T[i]))
+				#print("\tintersectionPoint:\t{0}".format(intersection))
+				#print(int(intersection[0]) == sweepline[0][0])
+				#print(int(intersection[1]) == sweepline[0][1])
+			if intersection[0] > p[0]:
+				#if not int(intersection[0]) == Ci[0] and not int(intersection[1]) == Ci[1]:
+				#if debugPoints(p): print("returning edge:\t{0}".format(T[i]))
+				found = True
+				result = T[i]
+		else:
+			#print("\tremoving edge from T:\t{0}".format(T[i]))
+			toDelete.append(T[i])
 		i+=1
-	return None
-
+	for e in toDelete:
+		try:
+			T.remove(e)
+		except ValueError:
+			print("\ttried to delete edge e from T that is not in T:\t{0}".format(e))
+	#if debugPoints(p): print("-----------------------")
+	return result
