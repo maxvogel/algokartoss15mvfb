@@ -4,7 +4,7 @@ from parser.gml import GML
 from map.draw import drawMap
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
-from algorithm.discard_accept import *
+#from algorithm.discard_accept import *
 import numpy as np
 
 gml = GML()
@@ -32,7 +32,7 @@ for i in range(0,len(gml.linesX)):
 
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
 C = zip(*polygonalChain)
-P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
+P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
 Ps = zip(*P)
 
 #print minMaxTangent(polygonalChain,0,7)
@@ -41,7 +41,11 @@ w_max, w_min, face = computeTangentSplitters(polygonalChain,0)
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
 distributedPoints = distributePoints(None,0,P,polygonalChain)
 
-print face
+#print("w_max:\t{0}".format(w_max))
+#print("w_min:\t{0}".format(w_min))
+#for f in face:
+#    print(f)
+
 
 
 
@@ -56,7 +60,7 @@ for e in distributedPoints:
 			pX.append(x[0])
 			pY.append(x[1])
         	tmpList += [x]
-plt.scatter(Ps[0], Ps[1], c=[[1,1,0] for x in Ps])
-plt.scatter(tuple(pX),tuple(pY))
+plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
+plt.scatter(tuple(pX),tuple(pY),c=[[0,1,0] for x in Ps])
 plt.plot(C[0], C[1])
 plt.show()

@@ -27,11 +27,14 @@ def distributePoints(Si, i, P, C):
 			if idx < len(C)-1 and not [C[idx],C[idx+1]] in T:
 				T += [[C[idx],C[idx+1]]]
 		else:
+			# sort by x-coordinate of the "left" point of the edge
+			T.sort(key=lambda x: x[0][0])
 			#print("find the left most edge e in T such that e is on the right side of {0} with regards to the sweep line".format(p))
 			e = findLeftMostEdgeRightOfP(T,p,C[i])
 			if e:
 				idx = C.index(e[0])
 				distributedPoints[idx] += [p]
+				#print("attaching point {0} to edge {1}".format(p,e))
 			#e = linkeste Kante v_k bis v_k+1 in T rechts von p auf sweep line 
 			#speichere p an e
 	return distributedPoints
@@ -54,30 +57,30 @@ def debugPoints(p):
 
 def findLeftMostEdgeRightOfP(T,p,Ci):
 	sweepline = getSweepLine(Ci,p)
-	#if debugPoints(p):
-		#print("checking point:\t{0}".format(p))
-		#print("\tT:\t{0}".format(T))
-		#print("\tsweepline:\t{0}".format(sweepline))		
+	#print("checking point:\t{0}".format(p))
+	#print("\tT:\t{0}".format(T))
+	#print("\tsweepline:\t{0}".format(sweepline))		
 	toDelete = []
 	result = None
 	found = False
 	i = 0
 	while not found and i < len(T):
-		#if debugPoints(p): print("\ttesting edge:\t{0}".format(T[i]))
+		#print("\ttesting edge:\t{0}".format(T[i]))
 		if intersect(sweepline[0],sweepline[1],T[i][0],T[i][1]):
 			intersection = intersectionPoint(sweepline[0],sweepline[1],T[i][0],T[i][1])
-			#if debugPoints(p):
-				#print("\tedge:\t{0}".format(T[i]))
-				#print("\tintersectionPoint:\t{0}".format(intersection))
-				#print(int(intersection[0]) == sweepline[0][0])
-				#print(int(intersection[1]) == sweepline[0][1])
+			#print("\tintersectionPoint:\t{0}".format(intersection))
+			#print(int(intersection[0]) == sweepline[0][0])
+			#print(int(intersection[1]) == sweepline[0][1])
 			if intersection[0] > p[0]:
 				#if not int(intersection[0]) == Ci[0] and not int(intersection[1]) == Ci[1]:
-				#if debugPoints(p): print("returning edge:\t{0}".format(T[i]))
+				#print("returning edge:\t{0}".format(T[i]))
 				found = True
 				result = T[i]
 		else:
 			#print("\tremoving edge from T:\t{0}".format(T[i]))
+			#if T[i] == [[70, 10], [75, -2]]: 
+			#	foo = 2
+			#else:
 			toDelete.append(T[i])
 		i+=1
 	for e in toDelete:
@@ -85,5 +88,5 @@ def findLeftMostEdgeRightOfP(T,p,Ci):
 			T.remove(e)
 		except ValueError:
 			print("\ttried to delete edge e from T that is not in T:\t{0}".format(e))
-	#if debugPoints(p): print("-----------------------")
+	#print("-----------------------")
 	return result
