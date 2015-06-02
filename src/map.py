@@ -39,10 +39,12 @@ Ps = zip(*P)
 w_max, w_min, face = computeTangentSplitters(polygonalChain,0)
 
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
-distributedPoints = distributePoints(None,0,P,polygonalChain)
+distributedPoints, representatives = distributePoints(face,0,P,polygonalChain,w_max,w_min)
+r = zip(*representatives)
 
 #print("w_max:\t{0}".format(w_max))
 #print("w_min:\t{0}".format(w_min))
+#print("number of faces:\t{0}".format(len(face)))
 #for f in face:
 #    print(f)
 
@@ -62,5 +64,6 @@ for e in distributedPoints:
         	tmpList += [x]
 plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
 plt.scatter(tuple(pX),tuple(pY),c=[[0,1,0] for x in Ps])
+plt.scatter(r[0], r[1],c=[[0,0,0] for x in polygonalChain])
 plt.plot(C[0], C[1])
 plt.show()

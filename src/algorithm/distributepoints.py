@@ -4,7 +4,7 @@ from tangentsegment import angle, intersect
 from util.planargeometry import *
 import Queue
 
-def distributePoints(Si, i, P, C):
+def distributePoints(Si, i, P, C, w_max, w_min):
 	#print(P)
 	Pdash = [p for p in P if p[0] > C[i][0]]
 	#print(Pdash)
@@ -28,6 +28,8 @@ def distributePoints(Si, i, P, C):
 				T += [[C[idx],C[idx+1]]]
 		else:
 			# sort by x-coordinate of the "left" point of the edge
+			# it probably would be cheaper to keep T sorted i.e. inserting an edge at the correct position
+			# rather than sorting it everytime
 			T.sort(key=lambda x: x[0][0])
 			#print("find the left most edge e in T such that e is on the right side of {0} with regards to the sweep line".format(p))
 			e = findLeftMostEdgeRightOfP(T,p,C[i])
@@ -35,9 +37,37 @@ def distributePoints(Si, i, P, C):
 				idx = C.index(e[0])
 				distributedPoints[idx] += [p]
 				#print("attaching point {0} to edge {1}".format(p,e))
-			#e = linkeste Kante v_k bis v_k+1 in T rechts von p auf sweep line 
-			#speichere p an e
-	return distributedPoints
+	filteredPoints = [[] for p in Si]
+	trackedPoints = []
+	for face in Si:
+		for p in range(0,len(face)-1):
+			if not face[p] in trackedPoints and face[p] in C:
+				trackedPoints += [face[p]]
+				#print(trackedPoints)
+				if len(distributedPoints[C.index(face[p])]) > 0:
+					for o in distributedPoints[C.index(face[p])]:
+						if not filteredPoints[Si.index(face)]:
+							filteredPoints[Si.index(face)] = o
+						elif isMinFace(face,w_min):
+							filteredPoints[Si.index(face)] = max(o,filteredPoints[Si.index(face)], key=lambda x: x[1])
+						elif isMaxFace(face,w_max):
+							filteredPoints[Si.index(face)] = min(o,filteredPoints[Si.index(face)], key=lambda x: x[1])
+						else:
+							print("face has neither min or max orientation")
+		#print("face {} with point {}".format(Si.index(face),filteredPoints[Si.index(face)]))
+	return distributedPoints, filteredPoints
+
+def isMaxFace(face,w_max):
+	for line in w_max:
+		if line[0] in face and line[1] in face:
+			return True
+	return False
+
+def isMinFace(face,w_min):
+	for line in w_min:
+		if line[0] in face and line[1] in face:
+			return True
+	return False
 
 def getSweepLine(Ci,p):
 	return [Ci,[Ci[0]+100*(p[0]-Ci[0]),Ci[1]+100*(p[1]-Ci[1])]]
