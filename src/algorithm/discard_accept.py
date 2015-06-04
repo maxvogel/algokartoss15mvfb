@@ -23,10 +23,11 @@ def discard_and_accept(C, Si, i):
     -------
 
     """
+    accept = []
     xaxis = [1,0]
     Qplus = [[C[i],Cj] for Cj in C[i+1:] if Cj[1] >= 0]
     Qmin  = [[C[i],Cj] for Cj in C[i+1:] if Cj[1] <  0]
-
+    j = i
     Qplus.sort(key=lambda x: angle(x[1],xaxis), reverse=True)
     Qmin.sort(key=lambda x: angle(x[1],xaxis), reverse=False)
     Q = Qplus + Qmin
@@ -38,4 +39,9 @@ def discard_and_accept(C, Si, i):
                 discardShortcuts("front", Q, slope)
             else:
                 discardShortcuts("back", Q, slope)
-        # TODO
+
+            while not face.tangentSplitterVertex(j):
+                j = j+1
+                if [C[i],C[j]] in Q:
+                    accept.append([C[i],C[j]])
+                    Q.remove([C[i],C[j]])

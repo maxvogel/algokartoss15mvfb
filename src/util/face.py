@@ -13,3 +13,6 @@ class face(object):
 
     def maximalTangent(self):
         return self.maximal
+
+    def tangentSplitterVertex(index):
+        return index == len(C)-1
