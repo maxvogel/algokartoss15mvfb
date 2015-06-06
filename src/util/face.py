@@ -9,10 +9,10 @@ class face(object):
         if there's a point associated with
         a face, return true
         """
-        return type(self.p) == list
+        return self.p
 
     def maximalTangent(self):
         return self.maximal
 
-    def tangentSplitterVertex(index):
-        return index == len(C)-1
+    def tangentSplitterVertex(self, index):
+        return index == len(self.C)-1
