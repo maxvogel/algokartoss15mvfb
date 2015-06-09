@@ -71,8 +71,11 @@ def minMaxTangent(C, i, j):
     dy = C[j][y]-C[i][y]
     normal_vec = [-dy,dx]
 
-    dotvj_pre  = np.dot(normal_vec,C[j-1])
-    dotvj_post = np.dot(normal_vec,C[j+1])
+    vivj_pre  = [C[j-1][x]-C[i][x], C[j-1][y]-C[i][y]]   # vector from vi to vj-1
+    vivj_post = [C[j+1][x]-C[i][x], C[j+1][y]-C[i][y]]   # vector from vi to vj+1
+
+    dotvj_pre  = np.dot(normal_vec, vivj_pre)
+    dotvj_post = np.dot(normal_vec, vivj_post)
 
     # vj-1 and vj+1 are on the same site of vij
     # <=> the dotproduct of those two vectors
@@ -82,7 +85,7 @@ def minMaxTangent(C, i, j):
         #vij is tangent
         if C[j-1][y] < C[j][y]:
             return 1
-        else:
+        elif C[j-1][y] > C[j][y]:
             return 0
     return -1
 
@@ -110,13 +113,13 @@ def computeTangentSplitters(C,i):
         if minMaxTangent(C,i,j) == 1:
             v_y = j
             k = j-1
-            lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
+            lij = [C[i], C[j]+10.0**6*(np.array(C[j])-np.array(C[i]))]
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
                 k = k-1
                 if minMaxTangent(C,i,k) == 1:
                     pass         #TODO
                 else:
-                    k = k-1
+                    pass
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
             w_max.append([C[j], interP])
 
@@ -125,13 +128,13 @@ def computeTangentSplitters(C,i):
         elif minMaxTangent(C,i,j) == 0:
             v_y = j
             k = j-1
-            lij = [C[i], C[j]+100*np.array(C[j])-np.array(C[i])]
+            lij = [C[i], C[j]+10.0**6*(np.array(C[j])-np.array(C[i]))]
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
                 k = k-1
                 if minMaxTangent(C,i,k) == 0:
                     pass         #TODO
                 else:
-                    k = k-1
+                    pass
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
             w_min.append([C[j], interP])
 
