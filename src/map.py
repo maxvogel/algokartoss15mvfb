@@ -5,6 +5,7 @@ from map.draw import drawMap
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
 from algorithm.discard_accept import *
+from util.planargeometry import distancePointLine
 from util.face import *
 import numpy as np
 
@@ -31,9 +32,19 @@ for i in range(0,len(gml.linesX)):
 
 """""
 
+
+def shortcutInEpsilonCorridor(C,shortcut,epsilon):
+  startIdx = C.index(shortcut[0])
+  endIdx = C.index(shortcut[1])
+  for i in range(startIdx+1,endIdx):
+    dist = distancePointLine(C,shortcut,C[i])
+    if (dist > epsilon): return False
+  return True
+
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
 C = zip(*polygonalChain)
-P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
+#P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
+P = []
 
 Ps = zip(*P)
 
@@ -57,6 +68,9 @@ Si = [face(f[0],representatives[0],False),
       face(f[3],representatives[3],True)]
 
 shortcuts = discard_and_accept(polygonalChain, Si, i)
+print(shortcuts)
+#valid_shortcuts = [shortcut for shortcut in shortcuts if shortcutInEpsilonCorridor(polygonalChain,shortcut,10)]
+#print(valid_shortcuts)
 shortcutlines = mc.LineCollection(shortcuts, linewidths=4, color='g')
 
 
@@ -66,8 +80,8 @@ ax.add_collection(tangentSplitters)
 ax.add_collection(shortcutlines)
 
 
-plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
-plt.scatter(zip(*points)[0],zip(*points)[1],c=[[0,1,0] for x in Ps])
-plt.scatter(r[0], r[1],c=[[0,0,0] for x in polygonalChain])
+if len(Ps) > 0: plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
+if len(points) > 0: plt.scatter(zip(*points)[0],zip(*points)[1],c=[[0,1,0] for x in Ps])
+if len(r) > 0: plt.scatter(r[0], r[1],c=[[0,0,0] for x in polygonalChain])
 plt.plot(C[0], C[1])
 plt.show()

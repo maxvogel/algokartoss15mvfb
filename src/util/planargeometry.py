@@ -40,3 +40,10 @@ def intersect(a,b,c,d):
     """
     return counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
            counterClockwise(a,b,c) != counterClockwise(a,b,d)
+
+def distancePointLine(C,line, p):
+    y = (line[1][1]-line[0][1])
+    x = (line[1][0]-line[0][0])
+    distance = abs(y*p[0] - x*p[1] + line[1][0]*line[0][1] - line[1][1]*line[0][0])
+    distance /= math.sqrt(y**2 + x**2)
+    return distance
