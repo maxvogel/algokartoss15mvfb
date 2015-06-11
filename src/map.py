@@ -8,6 +8,7 @@ from algorithm.discard_accept import *
 from util.planargeometry import distancePointLine
 from util.face import *
 import numpy as np
+#import networkx
 
 gml = GML()
 gml.getLines("../data/lines_out.txt")
@@ -32,6 +33,10 @@ for i in range(0,len(gml.linesX)):
 
 """""
 
+  
+
+
+
 
 def shortcutInEpsilonCorridor(C,shortcut,epsilon):
   startIdx = C.index(shortcut[0])
@@ -40,6 +45,84 @@ def shortcutInEpsilonCorridor(C,shortcut,epsilon):
     dist = distancePointLine(C,shortcut,C[i])
     if (dist > epsilon): return False
   return True
+
+def computeShortcutsForPolygonalChain(C,P,epsilon):
+  """
+  Computes a list of shortcuts for a polygonal chain C. The returned shortcuts are valid within the following two criteria:
+   - The orientation of nearby points P (i.e. right or left of C) won't change.
+   - All short-cut points lie within the epsilon corridor of the shortcut.
+
+  Parameters
+  ----------
+  C : list of points defining the the polygonal chain
+  P : list of points constraining the number of consistent shortcuts
+  epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
+
+  Returns
+  -------
+  A list with shortcuts.
+
+  """
+  shortcuts = []
+  for i in range(0,len(C)-1):
+    w_max, w_min, f = computeTangentSplitters(C,i)
+    distributedPoints, representatives = distributePoints(f,i,P,C,w_max,w_min)
+    Si = [face(f[0],representatives[0],False),
+      face(f[1],representatives[1],True),
+      face(f[2],representatives[2],False),
+      face(f[3],representatives[3],True)]
+    shortcuts += [shortcut for shortcut in discard_and_accept(C, Si, i) if shortcutInEpsilonCorridor(C,shortcut,epsilon)]
+  return shortcuts
+
+def transformToGraph(C,shortcuts):
+  """
+  Constructs a networkX graph object from the given polygonal chain and the given shortcuts.
+
+  Parameters
+  ----------
+  C : The polygonal chain
+  shortcuts: a list of shortcuts
+
+  Returns
+  -------
+  A networkX graph object.
+  """
+  G = networkx.digraph([i for i in range(0,len(C))])
+  G.add_edges([(i,i+1) for i in range(0,len(C)-1)])
+  for shortcut in shortcuts:
+    G.add_edge(C.index(shortcut[0]),C.index(shortcut[1]))
+  return G
+
+def getShortestPaths(C,G):
+  """
+  Wraps the shortest path function from networkX
+
+  Parameters
+  ----------
+  C : The polygonal chain to derive source and target vertex for the sssp calculation
+  G : The networkX Graph object
+
+  Returns
+  -------
+  A list of vertex ids representing the shortest path
+  """
+  return networkx.shortest_path(G,0,len(C)-1)
+
+def getSimplifiedPolygonalChain(C,path):
+  """
+  Transforms a path in a polygonal chain.
+
+  Parameters
+  ----------
+  C : the original polygonal chain
+  path : the vertex ids of the shortest path
+
+  Returns
+  -------
+  A list of points
+  """
+  return [C[p] for p in path]
+
 
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
 C = zip(*polygonalChain)
@@ -68,7 +151,7 @@ Si = [face(f[0],representatives[0],False),
       face(f[3],representatives[3],True)]
 
 shortcuts = discard_and_accept(polygonalChain, Si, i)
-print(shortcuts)
+#print(shortcuts)
 #valid_shortcuts = [shortcut for shortcut in shortcuts if shortcutInEpsilonCorridor(polygonalChain,shortcut,10)]
 #print(valid_shortcuts)
 shortcutlines = mc.LineCollection(shortcuts, linewidths=4, color='g')
