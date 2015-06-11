@@ -30,7 +30,23 @@ def intersectionPoint(a,b,c,d):
     return [Sx,Sy]
 
 def counterClockwise(a,b,c):
-    return (c[y]-a[y])*(b[x]-a[x]) > (b[y]-a[y])*(c[x]-a[x])
+    return (c[y]-a[y])*(b[x]-a[x]) >= (b[y]-a[y])*(c[x]-a[x])
+
+def between(a, b, c):
+    a = np.array(a); b = np.array(b); c = np.array(c)
+
+    if abs(np.cross(b-a, c-a)) > 0.005:
+        return False
+
+    dotp = np.dot(c-a, c-a)
+    if dotp < 0:
+        return False
+
+    d_ab = (np.linalg.norm(a-b))**2
+    if dotp > d_ab:
+        return False
+
+    return True
 
 def intersect(a,b,c,d):
     """
@@ -38,8 +54,11 @@ def intersect(a,b,c,d):
     -------
     true if line segments ab and cd intersect
     """
-    return counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
-           counterClockwise(a,b,c) != counterClockwise(a,b,d)
+    return (counterClockwise(a,c,d) != counterClockwise(b,c,d) and \
+           counterClockwise(a,b,c) != counterClockwise(a,b,d)) or \
+           between(a,b,c) or between(a,b,d)
+
+
 
 def distancePointLine(C,line, p):
     y = (line[1][1]-line[0][1])
