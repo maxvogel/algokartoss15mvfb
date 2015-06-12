@@ -33,9 +33,9 @@ for i in range(0,len(gml.linesX)):
 
 """""
 
-  
 
-
+def subdivision(faces, representatives, f_minmax):
+  return [face(faces[i],representatives[i], f_minmax[i]) for i in range(len(faces))]
 
 
 def shortcutInEpsilonCorridor(C,shortcut,epsilon):
@@ -65,12 +65,11 @@ def computeShortcutsForPolygonalChain(C,P,epsilon):
   """
   shortcuts = []
   for i in range(0,len(C)-1):
-    w_max, w_min, f = computeTangentSplitters(C,i)
+    w_max, w_min, f, minmax = computeTangentSplitters(C,i)
     distributedPoints, representatives = distributePoints(f,i,P,C,w_max,w_min)
-    Si = [face(f[0],representatives[0],False),
-      face(f[1],representatives[1],True),
-      face(f[2],representatives[2],False),
-      face(f[3],representatives[3],True)]
+
+    Si = subdivision(f,representatives,f_minmax)
+
     shortcuts += [shortcut for shortcut in discard_and_accept(C, Si, i) if shortcutInEpsilonCorridor(C,shortcut,epsilon)]
   return shortcuts
 
@@ -132,7 +131,7 @@ P = []
 Ps = zip(*P)
 
 i = 0
-w_max, w_min, f = computeTangentSplitters(polygonalChain,i)
+w_max, w_min, f, f_minmax = computeTangentSplitters(polygonalChain,i)
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
 
 distributedPoints, representatives = distributePoints(f,i,P,polygonalChain,w_max,w_min)
@@ -145,10 +144,7 @@ if [] in rep:
 r = zip(*rep)
 
 
-Si = [face(f[0],representatives[0],False),
-      face(f[1],representatives[1],True),
-      face(f[2],representatives[2],False),
-      face(f[3],representatives[3],True)]
+Si = subdivision(f,representatives,f_minmax)
 
 shortcuts = discard_and_accept(polygonalChain, Si, i)
 #print(shortcuts)

@@ -1,8 +1,8 @@
 class face(object):
-    def __init__(self, C, p, maximal):
+    def __init__(self, C, p, minmax):
         self.C = C  #polygonal chain
         self.p = p
-        self.maximal = maximal
+        self.minmax = minmax
 
     def pointStored(self):
         """
@@ -12,7 +12,10 @@ class face(object):
         return self.p
 
     def maximalTangent(self):
-        return self.maximal
+        if self.minmax == "max":
+            return True
+        elif self.minmax == "min":
+            return False
 
     def tangentSplitterVertex(self, index):
         return index == len(self.C)-1

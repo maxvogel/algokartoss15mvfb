@@ -105,7 +105,8 @@ def computeTangentSplitters(C,i):
     """
     w_max = []
     w_min = []
-    face  = []
+    face = []
+    minmax = []
     v_y = 0
 
     for j in range(i+1,len(C)):
@@ -124,6 +125,7 @@ def computeTangentSplitters(C,i):
             w_max.append([C[j], interP])
 
             face.append([interP] + C[k:v_y+1])
+            minmax.append("max")
 
         elif minMaxTangent(C,i,j) == 0:
             v_y = j
@@ -139,5 +141,6 @@ def computeTangentSplitters(C,i):
             w_min.append([C[j], interP])
 
             face.append([interP] + C[k:v_y+1])
+            minmax.append("min")
 
-    return w_max, w_min, face
+    return w_max, w_min, face, minmax
