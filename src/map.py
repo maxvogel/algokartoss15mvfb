@@ -8,7 +8,7 @@ from algorithm.discard_accept import *
 from util.planargeometry import distancePointLine
 from util.face import *
 import numpy as np
-#import networkx
+import networkx
 
 gml = GML()
 gml.getLines("../data/lines_out.txt")
@@ -86,10 +86,10 @@ def transformToGraph(C,shortcuts):
   -------
   A networkX graph object.
   """
-  G = networkx.digraph([i for i in range(0,len(C))])
-  G.add_edges([(i,i+1) for i in range(0,len(C)-1)])
-  for shortcut in shortcuts:
-    G.add_edge(C.index(shortcut[0]),C.index(shortcut[1]))
+  G = networkx.DiGraph()
+  G.add_edges_from([(i,i+1) for i in range(len(C)-1)])
+  G.add_edges_from([(C.index(s[0]), C.index(s[1])) for s in shortcuts])
+
   return G
 
 def getShortestPaths(C,G):
@@ -125,8 +125,8 @@ def getSimplifiedPolygonalChain(C,path):
 
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
 C = zip(*polygonalChain)
-#P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
-P = []
+P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[90,5],[53,-5],[59,-7],[65,7],[53,3],[58,-1],[40,-6],[51,19],[60,17],[65,17],[19,26],[37,28],[75,6],[87,13],[90,20],[48,10]]
+#P = []
 
 Ps = zip(*P)
 
@@ -135,6 +135,7 @@ w_max, w_min, f, f_minmax = computeTangentSplitters(polygonalChain,i)
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
 
 distributedPoints, representatives = distributePoints(f,i,P,polygonalChain,w_max,w_min)
+
 
 rep = list(representatives)
 
@@ -146,11 +147,15 @@ r = zip(*rep)
 
 Si = subdivision(f,representatives,f_minmax)
 
-shortcuts = discard_and_accept(polygonalChain, Si, i)
-#print(shortcuts)
-#valid_shortcuts = [shortcut for shortcut in shortcuts if shortcutInEpsilonCorridor(polygonalChain,shortcut,10)]
-#print(valid_shortcuts)
+# shortcuts = discard_and_accept(polygonalChain, Si, i)
+shortcuts =  computeShortcutsForPolygonalChain(polygonalChain,P,200.0)
+
+G = transformToGraph(polygonalChain,shortcuts)
+s = getShortestPaths(polygonalChain,G)
+
 shortcutlines = mc.LineCollection(shortcuts, linewidths=4, color='g')
+
+print s
 
 
 points = [item for sublist in distributedPoints for item in sublist]
