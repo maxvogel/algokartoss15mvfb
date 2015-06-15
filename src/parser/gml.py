@@ -20,7 +20,7 @@ class GML(object):
         self.pointsX = []
         self.pointsY = []
 
-    def getLines(self, pathToFile):
+    def readLines(self, pathToFile):
 
         with open(pathToFile) as txt:
             lines = txt.readlines()
@@ -45,7 +45,7 @@ class GML(object):
             self.linesY.append(ycoord)
 
 
-    def getPoints(self, pathToFile):
+    def readPoints(self, pathToFile):
 
         with open(pathToFile) as txt:
             points = txt.readlines()
@@ -63,4 +63,13 @@ class GML(object):
             pt = ppp.GetPoint(0)
             self.pointsX.append(pt[0])
             self.pointsY.append(pt[1])
+
+    def getListOfPoints(self):
+        return zip(self.pointsX, self.pointsY)
+
+    def getListOfLines(self):
+        lines = []
+        for i in range(0,len(self.index)):
+            lines.append((self.index[i],zip(self.linesX[i][1:],self.linesY[i][1:])))
+        return lines
 
