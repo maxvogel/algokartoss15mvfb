@@ -31,7 +31,7 @@ def runMain(args):
 		if k > 0 and len(shortcut) > k:
 			print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
 		else:
-			print("simplified polygonal chain index {} from {} to {} segments".format(idx,len(pc),len(shortcut)))
+			if k == 0: print("simplified polygonal chain index {} from {} to {} segments".format(idx,len(pc),len(shortcut)))
 			simplified_chains.append((idx,shortcut))
 	writeData(args[4],simplified_chains)
 
