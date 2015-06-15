@@ -49,7 +49,7 @@ def minMaxTangent(C, i, j):
     Parameters
     ----------
     C : list of x/y coordinates
-        polygonal Chain
+        polygonal chain
     i : int
         vertex vi
     j : int
@@ -89,6 +89,34 @@ def minMaxTangent(C, i, j):
             return 0
     return -1
 
+
+def buildface(C, k, v_y, w):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal chain with n vertices
+    k : int
+        starting index of C for face
+    v_y : int
+          end index of C for face
+    w : list of x/y coordinates
+        w_min or w_max
+
+    Returns
+    -------
+    a minimal or maximal face
+    """
+    if w:
+        predecessor = w[-1]
+
+        if predecessor[0] in C[k:v_y+1]:
+            idx = C.index(predecessor[0])
+            return [predecessor[1]] + C[idx:v_y+1]
+
+    return C[k:v_y+1]
+
+
 def computeTangentSplitters(C,i):
     """
     Parameters
@@ -122,9 +150,10 @@ def computeTangentSplitters(C,i):
                 else:
                     pass
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
-            w_max.append([C[j], interP])
 
-            face.append([interP] + C[k:v_y+1])
+            #face.append([interP] + C[k:v_y+1])
+            face.append([interP] + buildface(C,k,v_y,w_max))
+            w_max.append([C[j], interP])
             minmax.append("max")
 
         elif minMaxTangent(C,i,j) == 0:
@@ -138,9 +167,10 @@ def computeTangentSplitters(C,i):
                 else:
                     pass
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
-            w_min.append([C[j], interP])
 
-            face.append([interP] + C[k:v_y+1])
+            #face.append([interP] + C[k:v_y+1])
+            face.append([interP] + buildface(C,k,v_y,w_min))
+            w_min.append([C[j], interP])
             minmax.append("min")
 
     return w_max, w_min, face, minmax
