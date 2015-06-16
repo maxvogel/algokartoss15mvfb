@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
-from parser.gml import GML
+#from parser.gml import GML
 from map.draw import drawMap
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
@@ -9,10 +9,6 @@ from util.planargeometry import distancePointLine
 from util.face import *
 import numpy as np
 import networkx
-
-gml = GML()
-gml.getLines("../data/lines_out.txt")
-gml.getPoints("../data/points_out.txt")
 
 #drawMap(gml.linesX,gml.linesY,
 #        gml.pointsX,gml.pointsY,
@@ -65,11 +61,13 @@ def computeShortcutsForPolygonalChain(C,P,epsilon):
   """
   shortcuts = []
   for i in range(0,len(C)-1):
-    w_max, w_min, f, minmax = computeTangentSplitters(C,i)
-    distributedPoints, representatives = distributePoints(f,i,P,C,w_max,w_min)
+    w_max, w_min, f, f_minmax = computeTangentSplitters(polygonalChain,i)
+    distributedPoints, representatives = distributePoints(f,i,P,polygonalChain,w_max,w_min)
 
+    rep = list(representatives)
+    if [] in rep:
+      rep.remove([])
     Si = subdivision(f,representatives,f_minmax)
-
     shortcuts += [shortcut for shortcut in discard_and_accept(C, Si, i) if shortcutInEpsilonCorridor(C,shortcut,epsilon)]
   return shortcuts
 
@@ -131,6 +129,7 @@ P = [[-5,0],[8,20],[10,7],[15,3],[20,8],[25,15],[40,-7],[70,-7],[70,2],[80,0],[9
 Ps = zip(*P)
 
 i = 0
+
 w_max, w_min, f, f_minmax = computeTangentSplitters(polygonalChain,i)
 tangentSplitters = mc.LineCollection(w_max + w_min, linewidths=2, linestyles='dashed')
 
@@ -147,22 +146,23 @@ r = zip(*rep)
 
 Si = subdivision(f,representatives,f_minmax)
 
-# shortcuts = discard_and_accept(polygonalChain, Si, i)
+#shortcuts = discard_and_accept(polygonalChain, Si, i)
 shortcuts =  computeShortcutsForPolygonalChain(polygonalChain,P,200.0)
+shortcutlines = mc.LineCollection(shortcuts, linewidths=3, color='g')
 
 G = transformToGraph(polygonalChain,shortcuts)
 s = getShortestPaths(polygonalChain,G)
+#print s
 
-shortcutlines = mc.LineCollection(shortcuts, linewidths=4, color='g')
-
-print s
+s = getSimplifiedPolygonalChain(polygonalChain,s)
+#shortpath = mc.LineCollection([[s[i],s[i+1]] for i in range(0,len(s)-1)], linewidths=4, colors=[[1,.5,0] for i in range(0,len(s)-1)])
 
 
 points = [item for sublist in distributedPoints for item in sublist]
 fig, ax = plt.subplots()
 ax.add_collection(tangentSplitters)
 ax.add_collection(shortcutlines)
-
+#ax.add_collection(shortpath)
 
 if len(Ps) > 0: plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
 if len(points) > 0: plt.scatter(zip(*points)[0],zip(*points)[1],c=[[0,1,0] for x in Ps])
