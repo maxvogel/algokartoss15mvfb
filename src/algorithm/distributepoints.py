@@ -12,8 +12,8 @@ def distributePoints(Si, i, P, C, w_max, w_min):
 	#print(Pdash)
 	#for p in Pdash:
 	#	print(angle([C[i][0],C[i][1]+1],p))
-	Pdash.sort(key=lambda x: angle([C[i][0],C[i][1]+10],[x[0]-C[i][0],x[1]-C[i][1]]))
-	#print("the queue is:\t{0}".format(Pdash))
+	Pdash.sort(key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
+	#print("the queue for the point {0} is:\t{1}".format(C[i],Pdash))
 	#T binary search tree
 	T = []
 	distributedPoints = [[] for x in C]
@@ -22,7 +22,7 @@ def distributePoints(Si, i, P, C, w_max, w_min):
 		if p in C:
 			idx = C.index(p)
 			#print("point {0} of queue is in polygonal chain: update search tree with edges of the point".format(p))
-			if idx > 0 and not [C[idx-1],C[idx]] in T:
+			if idx > i and not [C[idx-1],C[idx]] in T:
 				T += [[C[idx-1],C[idx]]]
 			if idx < len(C)-1 and not [C[idx],C[idx+1]] in T:
 				T += [[C[idx],C[idx+1]]]
@@ -40,20 +40,23 @@ def distributePoints(Si, i, P, C, w_max, w_min):
 	filteredPoints = [[] for p in Si]
 	trackedPoints = []
 	for face in Si:
+		#print face, isMinFace(face, w_min)
 		for p in range(0,len(face)-1):
 			if not face[p] in trackedPoints and face[p] in C:
 				trackedPoints += [face[p]]
 				#print(trackedPoints)
 				if len(distributedPoints[C.index(face[p])]) > 0:
 					for o in distributedPoints[C.index(face[p])]:
+						#print o, angle([C[i][0],C[i][1]+10],[o[0]-C[i][0],o[1]-C[i][1]])
 						if not filteredPoints[Si.index(face)]:
 							filteredPoints[Si.index(face)] = o
 						elif isMinFace(face,w_min):
-							filteredPoints[Si.index(face)] = max(o,filteredPoints[Si.index(face)], key=lambda x: x[1])
+							filteredPoints[Si.index(face)] = min(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 						elif isMaxFace(face,w_max):
-							filteredPoints[Si.index(face)] = min(o,filteredPoints[Si.index(face)], key=lambda x: x[1])
+							filteredPoints[Si.index(face)] = max(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 						else:
 							print("face has neither min or max orientation")
+	#print("----------------------------")
 		#print("face {} with point {}".format(Si.index(face),filteredPoints[Si.index(face)]))
 	return distributedPoints, filteredPoints
 
