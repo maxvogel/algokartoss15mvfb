@@ -11,6 +11,7 @@ def slope(vec1,vec2):
 def discardShortcuts(from_, Q, m):
     if from_ == "front":
         while Q and slope(Q[0][0],Q[0][1]) > m:
+            print slope(Q[0][0],Q[0][1]), Q[0][0],Q[0][1]
             Q.pop(0)
 
     elif from_ == "back":
@@ -32,12 +33,15 @@ def discard_and_accept(C, Si, i):
     accept = []
     j = i
 
-    Q = [[C[i],Cj] for Cj in C[i+1:]]
+    Q = [[C[i],Cj] for Cj in C[i+2:]]
     Q.sort(key=lambda v: slope(v[0],v[1]), reverse=True)
 
-    for face in Si:
+    for k in range(0,len(Si)):
+        face = Si[k]
+        #if i == 0: print face.C, face.maximalTangent(), face.p
         if face.pointStored():
             m = slope(C[i], face.p)
+            #if i == 0: print m
             if face.maximalTangent():
                 discardShortcuts("front", Q, m)
             else:
