@@ -3,6 +3,52 @@ from tangentsegment import *
 from distributepoints import *
 from discard_accept import *
 
+def angle(vec1, vec2):
+    dotp  = np.dot(vec1,vec2)
+    norm_v1 = np.linalg.norm(vec1)
+    norm_v2 = np.linalg.norm(vec2)
+    return math.acos(dotp/(norm_v1*norm_v2))
+
+def getPrincipalAngle(C):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal Chain
+
+    Returns
+    -------
+    the angle between start_end_line (first to last vertex)
+    and the x-axis
+    """
+    start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
+    xaxis = [1,0]
+    return angle(start_end_line,xaxis)
+
+def rotate(C, angle):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal Chain
+    angle : float
+        angle in radians
+
+    Returns
+    -------
+    the rotated polygonal chain
+    """
+    rotationMatrix = [[math.cos(angle), -math.sin(angle)],
+                      [math.sin(angle),  math.cos(angle)]]
+
+    rotatedC = []
+    for vertex in C:
+        rotate = np.dot(rotationMatrix, vertex)
+        newC.append(rotate)
+
+    rotatedC = zip(*newC)
+    return rotatedC
+
 
 def subdivision(faces, representatives, f_minmax):
   return [face(faces[i],representatives[i], f_minmax[i]) for i in range(len(faces))]
@@ -100,3 +146,11 @@ def computeSimplifiedChain(C,P,epsilon):
   s = getShortestPaths(C,G)
   sp = getSimplifiedPolygonalChain(C,s)
   return sp
+
+
+def computeShortcutsForArbitraryChain(P, xMonotoneSubChains, epsilon):
+  shortcuts = []
+  for chain in xMonotoneSubChains:
+    shortcuts.append(computeShortcutsForPolygonalChain(chain,P,epsilon))
+
+  return shortcuts

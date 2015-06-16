@@ -4,46 +4,6 @@ from util.planargeometry import *
 
 x = 0; y = 1
 
-def getPrincipalAngle(C):
-    """
-    Parameters
-    ----------
-    C : list of x/y coordinates
-        polygonal Chain
-
-    Returns
-    -------
-    the angle between start_end_line (first to last vertex)
-    and the x-axis
-    """
-    start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
-    xaxis = [1,0]
-    return angle(start_end_line,xaxis)
-
-def rotate(C, angle):
-    """
-    Parameters
-    ----------
-    C : list of x/y coordinates
-        polygonal Chain
-    angle : float
-        angle in radians
-
-    Returns
-    -------
-    the rotated polygonal chain
-    """
-    rotationMatrix = [[math.cos(angle), -math.sin(angle)],
-                      [math.sin(angle),  math.cos(angle)]]
-
-    rotatedC = []
-    for vertex in C:
-        rotate = np.dot(rotationMatrix, vertex)
-        newC.append(rotate)
-
-    rotatedC = zip(*newC)
-    return rotatedC
-
 def minMaxTangent(C, i, j):
     """
     Parameters
