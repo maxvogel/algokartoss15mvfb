@@ -44,9 +44,9 @@ def rotate(C, angle):
     rotatedC = []
     for vertex in C:
         rotate = np.dot(rotationMatrix, vertex)
-        newC.append(rotate)
+        rotatedC.append(rotate)
 
-    rotatedC = zip(*newC)
+    #rotatedC = zip(*rotatedC)
     return rotatedC
 
 

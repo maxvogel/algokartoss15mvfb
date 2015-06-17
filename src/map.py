@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
-#from parser.gml import GML
+from parser.gml import GML
 from map.draw import drawMap
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
@@ -9,116 +9,77 @@ from util.planargeometry import distancePointLine
 from util.face import *
 import numpy as np
 import networkx
+from algorithm.arbitrarychains import *
+from algorithm.helper import *
+from simp import writeData
 
-#drawMap(gml.linesX,gml.linesY,
-#        gml.pointsX,gml.pointsY,
-#        gml.index,
-#        annotate=True)
-"""""
-rot = []
-for i in range(0,len(gml.linesX)):
-    xy = zip(gml.linesX[i][1:], gml.linesY[i][1:])
-
-    a = t.getPrincipalAngle(xy)
-
-    #    print i, a, t.rotate(xy,a)
-    r = t.rotate(xy,a)
-    print r
-    print "              "
-    plt.plot(r[0],r[1])
-
-"""""
+gml = GML()
+gml.readLines('../data/lines_out.txt')
+gml.readPoints('../data/points_out.txt')
 
 
-def subdivision(faces, representatives, f_minmax):
-  return [face(faces[i],representatives[i], f_minmax[i]) for i in range(len(faces))]
+def preprocess(C, points):
+  a = getPrincipalAngle(C)
+  rotatedC = rotate(C,a)
+  rotatedP = rotate(points,a)
+  return map(list, rotatedC), map(list,rotatedP)
 
 
-def shortcutInEpsilonCorridor(C,shortcut,epsilon):
-  startIdx = C.index(shortcut[0])
-  endIdx = C.index(shortcut[1])
-  for i in range(startIdx+1,endIdx):
-    dist = distancePointLine(C,shortcut,C[i])
-    if (dist > epsilon): return False
-  return True
+def computeShortcutsForArbitraryChain(xMonotoneSubChains, P, epsilon):
+    shortcuts = []
+    for chain in xMonotoneSubChains:
+        if len(chain) > 1:
+            shortcuts += computeShortcutsForPolygonalChain(chain,P,epsilon)
 
-def computeShortcutsForPolygonalChain(C,P,epsilon):
-  """
-  Computes a list of shortcuts for a polygonal chain C. The returned shortcuts are valid within the following two criteria:
-   - The orientation of nearby points P (i.e. right or left of C) won't change.
-   - All short-cut points lie within the epsilon corridor of the shortcut.
+    return shortcuts
 
-  Parameters
-  ----------
-  C : list of points defining the the polygonal chain
-  P : list of points constraining the number of consistent shortcuts
-  epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
 
-  Returns
-  -------
-  A list with shortcuts.
+def simplify(polygonalChains, points):
+    shortcuts = []
+    simplifiedC = []
+    for chain in polygonalChains:
+        C = map(list, chain[1:][0])
+        rotatedC, rotatedP = preprocess(C, points)
 
-  """
-  shortcuts = []
-  for i in range(0,len(C)-1):
-    w_max, w_min, f, f_minmax = computeTangentSplitters(polygonalChain,i)
-    distributedPoints, representatives = distributePoints(f,i,P,polygonalChain,w_max,w_min)
+        xMonotoneSubC = xMonotoneSubchains(rotatedC)
+        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, 99999999))
 
-    rep = list(representatives)
-    if [] in rep:
-      rep.remove([])
-    Si = subdivision(f,representatives,f_minmax)
-    shortcuts += [shortcut for shortcut in discard_and_accept(C, Si, i) if shortcutInEpsilonCorridor(C,shortcut,epsilon)]
-  return shortcuts
 
-def transformToGraph(C,shortcuts):
-  """
-  Constructs a networkX graph object from the given polygonal chain and the given shortcuts.
+        G = transformToGraph(rotatedC,shortcuts[-1])
+        s = getShortestPaths(rotatedC,G)
 
-  Parameters
-  ----------
-  C : The polygonal chain
-  shortcuts: a list of shortcuts
+        simplifiedC.append(getSimplifiedPolygonalChain(C,s))
 
-  Returns
-  -------
-  A networkX graph object.
-  """
-  G = networkx.DiGraph()
-  G.add_edges_from([(i,i+1) for i in range(len(C)-1)])
-  G.add_edges_from([(C.index(s[0]), C.index(s[1])) for s in shortcuts])
+    return simplifiedC
 
-  return G
 
-def getShortestPaths(C,G):
-  """
-  Wraps the shortest path function from networkX
+simp =  simplify(gml.getListOfLines(), gml.getListOfPoints())
+writeData('result.txt', simp)
 
-  Parameters
-  ----------
-  C : The polygonal chain to derive source and target vertex for the sssp calculation
-  G : The networkX Graph object
+gmlSimplified = GML()
+gmlSimplified.readLines('./result.txt')
+gmlSimplified.readPoints('../data/points_out.txt')
 
-  Returns
-  -------
-  A list of vertex ids representing the shortest path
-  """
-  return networkx.shortest_path(G,0,len(C)-1)
+plt.subplot(1, 2, 1)
+plt.xticks(()); plt.yticks(())
+plt.title("Simplified")
+drawMap(gmlSimplified.linesX, gmlSimplified.linesY,
+        gml.pointsX,gml.pointsY,
+        gmlSimplified.index,
+        annotate=False)
 
-def getSimplifiedPolygonalChain(C,path):
-  """
-  Transforms a path in a polygonal chain.
+plt.subplot(1, 2, 2)
+plt.xticks(()); plt.yticks(())
+plt.title("Original")
+drawMap(gml.linesX,gml.linesY,
+        gml.pointsX,gml.pointsY,
+        gml.index,
+        annotate=False)
+plt.tight_layout()
+plt.show()
 
-  Parameters
-  ----------
-  C : the original polygonal chain
-  path : the vertex ids of the shortest path
-
-  Returns
-  -------
-  A list of points
-  """
-  return [C[p] for p in path]
+#################
+#################
 
 
 polygonalChain = [[0,0],[10,20],[30,30],[45,22],[50,-5],[60,-10],[70,10],[75,-2],[90,15],[92,25]]  # -> paper
@@ -168,4 +129,4 @@ if len(Ps) > 0: plt.scatter(Ps[0], Ps[1], c=[[1,0,0] for x in Ps])
 if len(points) > 0: plt.scatter(zip(*points)[0],zip(*points)[1],c=[[0,1,0] for x in Ps])
 if len(r) > 0: plt.scatter(r[0], r[1],c=[[0,0,0] for x in polygonalChain])
 plt.plot(C[0], C[1])
-plt.show()
+#plt.show()

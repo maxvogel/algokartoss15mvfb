@@ -27,6 +27,6 @@ def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
             )
 
 
-    plt.show()
+    #plt.show()
 
 

@@ -15,7 +15,7 @@ def writeData(file_simple,polygonal_chains):
 	with open(file_simple,"w") as file:
 		base_str = """{}:<gml:LineString srsName="EPSG:54004" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="." cs="," ts=" ">{}</gml:coordinates></gml:LineString>\n"""
 		for chain in polygonal_chains:
-			chainStr = [",".join([str(p) for p in point]) for point in chain[1]]
+			chainStr = [",".join([str(p) for p in point]) for point in chain]
 			file.write(base_str.format(chain[0]," ".join(chainStr)))
 
 def runMain(args):
