@@ -18,7 +18,18 @@ def isRightTurn(C, i):
     if i == 0 or i == len(C)-1: return False
     return C[i-1][0] > C[i][0] and C[i+1][0] > C[i][0]
 
-def xmonotoneSubchains(C):
+def startsToRight(C,i):
+    while i < len(C)-1 and C[i][0] > C[i+1][0]:
+        i = i+1
+    return i
+
+def isXmonotone(C):
+    for i in range(len(C)-2):
+        if C[i][0] > C[i+1][0]:
+            return False
+    return True
+
+def xMonotoneSubchains(C):
     """
     Returns
     -------
@@ -31,11 +42,19 @@ def xmonotoneSubchains(C):
 
     while i < len(C):
         x = []
-        if not isLeftTurn(C,i):
-            x.append(C[i])
-        else:
-            subchain.append(x)
-            while not isRightTurn:
-                i = i+1
 
-    return subchains
+        if i == 0:
+            i = startsToRight(C,i)
+
+        while i < len(C) and not isLeftTurn(C,i):
+            x.append(C[i])
+            i = i+1
+
+        while i < len(C) and not isRightTurn(C,i):
+            i = i+1
+
+        if x:
+            subchains.append(x)
+
+    if subchains:
+        return subchains
