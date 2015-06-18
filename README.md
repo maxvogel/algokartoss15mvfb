@@ -6,6 +6,7 @@ The algorithm is implemented in `python2`(!) and utilizes a few third party pack
 * `numpy`
 * `shapely`
 * `osgeo` (via gdal)
+* `networkx`
 
 Usage:
 `python[2] simp.py MaxEdgesToKeep LineInputFilePath PointInputFilePath OutputFilePath` 
