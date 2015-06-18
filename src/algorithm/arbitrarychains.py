@@ -11,7 +11,7 @@ def determineSubchain(C,i):
   while j < len(C) and isValid(C,i,j): #and "interval not empty" 
     j +=1
     #diminish interval: "the angles of half-lines that intersect C[j-1]C[j]"
-  if Interval = ():
+  if Interval == ():
     return j-1
   else:
     return j

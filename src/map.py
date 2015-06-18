@@ -19,9 +19,15 @@ gml.readPoints('../data/points_out.txt')
 
 
 def preprocess(C, points):
-  a = getPrincipalAngle(C)
-  rotatedC = rotate(C,a)
-  rotatedP = rotate(points,a)
+  t = -np.array(C[0])
+
+  translatedC = translate(C,t)
+  translatedP = translate(points, t)
+
+  a = getPrincipalAngle(translatedC)
+
+  rotatedC = rotate(translatedC,a)
+  rotatedP = rotate(translatedP,a)
   return map(list, rotatedC), map(list,rotatedP)
 
 

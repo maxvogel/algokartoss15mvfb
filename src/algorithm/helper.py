@@ -2,12 +2,20 @@ import networkx
 from tangentsegment import *
 from distributepoints import *
 from discard_accept import *
+import math
 
 def angle(vec1, vec2):
     dotp  = np.dot(vec1,vec2)
     norm_v1 = np.linalg.norm(vec1)
     norm_v2 = np.linalg.norm(vec2)
     return math.acos(dotp/(norm_v1*norm_v2))
+
+def translate(C, t):
+    translatedC = []
+    for vertex in C:
+        translatedC.append(np.array(vertex) + t)
+
+    return translatedC
 
 def getPrincipalAngle(C):
     """
@@ -23,6 +31,9 @@ def getPrincipalAngle(C):
     """
     start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
     xaxis = [1,0]
+    if C[-1][1] > 0:
+        return 2*math.pi - angle(start_end_line, xaxis)
+
     return angle(start_end_line,xaxis)
 
 def rotate(C, angle):
