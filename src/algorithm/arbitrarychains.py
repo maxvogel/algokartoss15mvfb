@@ -1,3 +1,21 @@
+import math
+
+def isValid(C,i,j):
+    a1 = angle([C[i][0]-C[j][0],[C[i][1]-C[j][1]]],[C[j+1][0]-C[j][0],[C[j+1][1]-C[j][1]]])
+    a2 = angle([C[i][0]-C[j][0],[C[i][1]-C[j][1]]],[C[j-1][0]-C[j][0],[C[j-1][1]-C[j][1]]])
+    return (a1 < a2 and a2 < math.pi) or (math.pi < a2 and a2 < a1)
+
+def determineSubchain(C,i):
+  j = i+1
+  Interval = ()
+  while j < len(C) and isValid(C,i,j): #and "interval not empty" 
+    j +=1
+    #diminish interval: "the angles of half-lines that intersect C[j-1]C[j]"
+  if Interval = ():
+    return j-1
+  else:
+    return j
+
 def isLeftTurn(C, i):
     """
     Returns

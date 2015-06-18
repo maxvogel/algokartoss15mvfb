@@ -91,6 +91,38 @@ def computeShortcutsForPolygonalChain(C,P,epsilon):
       shortcuts += [shortcut for shortcut in discard_and_accept(C, Si, i)]
   return shortcuts
 
+def computeShortcutsForPolygonalChain2(C,P,epsilon):
+  """
+  Computes a list of shortcuts for a polygonal chain C. The returned shortcuts are valid within the following two criteria:
+   - The orientation of nearby points P (i.e. right or left of C) won't change.
+   - All short-cut points lie within the epsilon corridor of the shortcut.
+
+  Parameters
+  ----------
+  C : list of points defining the the polygonal chain
+  P : list of points constraining the number of consistent shortcuts
+  epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
+
+  Returns
+  -------
+  A list with shortcuts.
+
+  """
+  shortcuts = []
+  for i in range(0,len(C)-1):
+    j = determineSubchain(C,i)
+    subchain = C[0:j+1]
+    w_max, w_min, f, f_minmax = computeTangentSplitters(subchain,i)
+    distributedPoints, representatives = distributePoints(f,i,P,subchain,w_max,w_min)
+
+    Si = subdivision(f,representatives,f_minmax)
+
+    if not epsilon is None:
+      shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, i) if shortcutInEpsilonCorridor(subchain,shortcut,epsilon)]
+    else:
+      shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, i)]
+  return shortcuts
+
 def transformToGraph(C,shortcuts):
   """
   Constructs a networkX graph object from the given polygonal chain and the given shortcuts.
