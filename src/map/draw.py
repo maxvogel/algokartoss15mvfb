@@ -30,3 +30,23 @@ def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
     #plt.show()
 
 
+def plotSimplifiedAndOriginal(gml, gmlSimplified):
+
+    plt.subplot(1, 2, 1)
+    plt.xticks(()); plt.yticks(())
+    plt.title("Simplified")
+    drawMap(gmlSimplified.linesX, gmlSimplified.linesY,
+        gml.pointsX,gml.pointsY,
+        gmlSimplified.index,
+        annotate=False)
+
+    plt.subplot(1, 2, 2)
+    plt.xticks(()); plt.yticks(())
+    plt.title("Original")
+    drawMap(gml.linesX,gml.linesY,
+        gml.pointsX,gml.pointsY,
+        gml.index,
+        annotate=False)
+    plt.tight_layout()
+
+    plt.show()

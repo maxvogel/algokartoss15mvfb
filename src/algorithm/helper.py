@@ -2,7 +2,9 @@ import networkx
 from tangentsegment import *
 from distributepoints import *
 from discard_accept import *
+from arbitrarychains import *
 import math
+
 
 def angle(vec1, vec2):
     dotp  = np.dot(vec1,vec2)
@@ -184,16 +186,48 @@ def getSimplifiedPolygonalChain(C,path):
   return [C[p] for p in path]
 
 def computeSimplifiedChain(C,P,epsilon):
-  shortcuts = computeShortcutsForPolygonalChain(C,P,epsilon)
-  G = transformToGraph(C,shortcuts)
-  s = getShortestPaths(C,G)
-  sp = getSimplifiedPolygonalChain(C,s)
-  return sp
+    shortcuts = computeShortcutsForPolygonalChain(C,P,epsilon)
+    G = transformToGraph(C,shortcuts)
+    s = getShortestPaths(C,G)
+    sp = getSimplifiedPolygonalChain(C,s)
+    return sp
 
 
-def computeShortcutsForArbitraryChain(P, xMonotoneSubChains, epsilon):
-  shortcuts = []
-  for chain in xMonotoneSubChains:
-    shortcuts.append(computeShortcutsForPolygonalChain(chain,P,epsilon))
+def computeShortcutsForArbitraryChain(xMonotoneSubChains, P, epsilon):
+    shortcuts = []
+    for chain in xMonotoneSubChains:
+        if len(chain) > 1:
+            shortcuts += computeShortcutsForPolygonalChain(chain,P,epsilon)
 
-  return shortcuts
+    return shortcuts
+
+
+def preprocess(C, points):
+    t = -np.array(C[0])
+
+    translatedC = translate(C,t)
+    translatedP = translate(points, t)
+
+    a = getPrincipalAngle(translatedC)
+
+    rotatedC = rotate(translatedC,a)
+    rotatedP = rotate(translatedP,a)
+    return map(list, rotatedC), map(list,rotatedP)
+
+def simplify(polygonalChains, points, epsilon):
+    shortcuts = []
+    simplifiedC = []
+    for chain in polygonalChains:
+        C = map(list, chain[1:][0])
+        rotatedC, rotatedP = preprocess(C, points)
+
+        xMonotoneSubC = xMonotoneSubchains(rotatedC)
+        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, epsilon))
+
+
+        G = transformToGraph(rotatedC,shortcuts[-1])
+        s = getShortestPaths(rotatedC,G)
+
+        simplifiedC.append(getSimplifiedPolygonalChain(C,s))
+
+    return simplifiedC

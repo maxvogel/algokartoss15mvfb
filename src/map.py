@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
 from parser.gml import GML
-from map.draw import drawMap
+from map.draw import drawMap, plotSimplifiedAndOriginal
 from algorithm.tangentsegment import *
 from algorithm.distributepoints import *
 from algorithm.discard_accept import *
@@ -18,71 +18,17 @@ gml.readLines('../data/lines_out.txt')
 gml.readPoints('../data/points_out.txt')
 
 
-def preprocess(C, points):
-  t = -np.array(C[0])
+simp = simplify(gml.getListOfLines(), gml.getListOfPoints(), 10**6)
+#writeData('result.txt', simp)
 
-  translatedC = translate(C,t)
-  translatedP = translate(points, t)
-
-  a = getPrincipalAngle(translatedC)
-
-  rotatedC = rotate(translatedC,a)
-  rotatedP = rotate(translatedP,a)
-  return map(list, rotatedC), map(list,rotatedP)
+#gmlSimplified = GML()
+#gmlSimplified.readLines('./result.txt')
+#gmlSimplified.readPoints('../data/points_out.txt')
 
 
-def computeShortcutsForArbitraryChain(xMonotoneSubChains, P, epsilon):
-    shortcuts = []
-    for chain in xMonotoneSubChains:
-        if len(chain) > 1:
-            shortcuts += computeShortcutsForPolygonalChain(chain,P,epsilon)
 
-    return shortcuts
+#plotSimplifiedAndOriginal(gml,gmlSimplified)
 
-
-def simplify(polygonalChains, points):
-    shortcuts = []
-    simplifiedC = []
-    for chain in polygonalChains:
-        C = map(list, chain[1:][0])
-        rotatedC, rotatedP = preprocess(C, points)
-
-        xMonotoneSubC = xMonotoneSubchains(rotatedC)
-        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, 99999999))
-
-
-        G = transformToGraph(rotatedC,shortcuts[-1])
-        s = getShortestPaths(rotatedC,G)
-
-        simplifiedC.append(getSimplifiedPolygonalChain(C,s))
-
-    return simplifiedC
-
-
-simp =  simplify(gml.getListOfLines(), gml.getListOfPoints())
-writeData('result.txt', simp)
-
-gmlSimplified = GML()
-gmlSimplified.readLines('./result.txt')
-gmlSimplified.readPoints('../data/points_out.txt')
-
-plt.subplot(1, 2, 1)
-plt.xticks(()); plt.yticks(())
-plt.title("Simplified")
-drawMap(gmlSimplified.linesX, gmlSimplified.linesY,
-        gml.pointsX,gml.pointsY,
-        gmlSimplified.index,
-        annotate=False)
-
-plt.subplot(1, 2, 2)
-plt.xticks(()); plt.yticks(())
-plt.title("Original")
-drawMap(gml.linesX,gml.linesY,
-        gml.pointsX,gml.pointsY,
-        gml.index,
-        annotate=False)
-plt.tight_layout()
-plt.show()
 
 #################
 #################

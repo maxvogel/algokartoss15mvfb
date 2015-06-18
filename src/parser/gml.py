@@ -72,4 +72,3 @@ class GML(object):
         for i in range(0,len(self.index)):
             lines.append((self.index[i],zip(self.linesX[i][1:],self.linesY[i][1:])))
         return lines
-
