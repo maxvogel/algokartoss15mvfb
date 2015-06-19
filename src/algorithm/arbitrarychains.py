@@ -62,6 +62,9 @@ def isXmonotone(C):
             return False
     return True
 
+def isSamePoint(p1,p2):
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) < 10**-9
+
 def xMonotoneSubchains(C):
     """
     Returns
@@ -70,6 +73,9 @@ def xMonotoneSubchains(C):
     a list of all x-monotone subchain, which are
     defined by left and right turns of the polygonal chain
     """
+
+    if isSamePoint(C[0],C[-1]): print("polygonal chain is a cycle")
+    if isXmonotone(C): return [C]
 
     i = 0; subchains = []
 
@@ -90,4 +96,5 @@ def xMonotoneSubchains(C):
             subchains.append(x)
 
     if subchains:
+        print "split into {} subchains".format(len(subchains))
         return subchains
