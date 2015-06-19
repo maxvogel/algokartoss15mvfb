@@ -214,11 +214,23 @@ def preprocess(C, points):
     rotatedP = rotate(translatedP,a)
     return map(list, rotatedC), map(list,rotatedP)
 
+def simplifyChain(C, points, epsilon):
+    rotatedC, rotatedP = preprocess(C, points)
+
+    xMonotoneSubC = xMonotoneSubchains(rotatedC)
+    shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, epsilon)
+
+    G = transformToGraph(rotatedC,shortcuts)
+    s = getShortestPaths(rotatedC,G)
+
+    return getSimplifiedPolygonalChain(C,s)
+
+
 def simplify(polygonalChains, points, epsilon):
     shortcuts = []
     simplifiedC = []
     for chain in polygonalChains:
-        C = map(list, chain[1:][0])
+        #C = map(list, chain[1:][0])
         rotatedC, rotatedP = preprocess(C, points)
 
         xMonotoneSubC = xMonotoneSubchains(rotatedC)

@@ -29,15 +29,18 @@ def runMain(args):
         try:
 		# TODO: maybe check manually if the given paths are actually files. currently, there is Error raised if wrong file(path)s are given
 		gml, polygonalChains, points = readData(args[2+plot_flag],args[3+plot_flag])
+                print "Successfully read lines from file {}, and points from file {}.".format(args[2+plot_flag],args[3+plot_flag])
+
 	except IOError as e:
 		print "I/O error({0}): {1}".format(e.errno, e.strerror)
 
 
 	k = int(args[1+plot_flag])
 	simplified_chains = []
+
 	for idx,pc in polygonalChains:
 
-		shortcut = computeSimplifiedChain(pc,points,None)
+		shortcut = simplifyChain(pc, points, 10**10)  #computeSimplifiedChain(pc,points,None)
 		if k > 0 and len(shortcut) > k:
 			print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
 		else:
