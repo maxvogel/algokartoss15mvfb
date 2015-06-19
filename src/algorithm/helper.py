@@ -31,7 +31,12 @@ def getPrincipalAngle(C):
     the angle between start_end_line (first to last vertex)
     and the x-axis
     """
-    start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
+    if C[0].any() == C[-1].any():
+        start_end_line = [C[-2][0]-C[0][0],C[-2][1]-C[0][1]]
+
+    else:
+        start_end_line = [C[-1][0]-C[0][0],C[-1][1]-C[0][1]]
+
     xaxis = [1,0]
     if C[-1][1] > 0:
         return 2*math.pi - angle(start_end_line, xaxis)

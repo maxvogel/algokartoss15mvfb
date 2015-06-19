@@ -73,8 +73,9 @@ def xMonotoneSubchains(C):
     a list of all x-monotone subchain, which are
     defined by left and right turns of the polygonal chain
     """
+    if C[0] == C[-1]:
+        print("polygonal chain is a cycle")
 
-    if isSamePoint(C[0],C[-1]): print("polygonal chain is a cycle")
     if isXmonotone(C): return [C]
 
     i = 0; subchains = []
