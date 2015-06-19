@@ -1,20 +1,35 @@
 import math
+import numpy as np
+from util.planargeometry import *
 
 def isValid(C,i,j):
-    a1 = angle([C[i][0]-C[j][0],[C[i][1]-C[j][1]]],[C[j+1][0]-C[j][0],[C[j+1][1]-C[j][1]]])
-    a2 = angle([C[i][0]-C[j][0],[C[i][1]-C[j][1]]],[C[j-1][0]-C[j][0],[C[j-1][1]-C[j][1]]])
+    a1 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j+1][0]-C[j][0],C[j+1][1]-C[j][1]])
+    a2 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j-1][0]-C[j][0],C[j-1][1]-C[j][1]])
     return (a1 < a2 and a2 < math.pi) or (math.pi < a2 and a2 < a1)
 
+def diminishInterval(I,j):
+    for angle in I:
+        halfline = [[0,0], [10**6*math.cos(angle), 10**6*math.sin(angle)]]
+        if intersects(C[j-1],C[j],halfline[0],halfline[1]):
+            I.remove(angle)
+    return I
+
 def determineSubchain(C,i):
-  j = i+1
-  Interval = ()
-  while j < len(C) and isValid(C,i,j): #and "interval not empty" 
-    j +=1
-    #diminish interval: "the angles of half-lines that intersect C[j-1]C[j]"
-  if Interval == ():
-    return j-1
-  else:
-    return j
+    j = i+1
+    Interval = np.linspace(-math.pi, math.pi, 500, endpoint=False)
+    vivj = [C[j][0]- C[i][0],C[j][1]- C[i][1]]
+    angle_vivj = angle([1,0], vivj)
+
+    if angle_vivj in Interval:
+        Inverval.tolist().remove(angle_vivj)
+
+    while j < len(C) and isValid(C,i,j) and Interval.tolist():
+        j +=1
+        diminishInterval(Interval, j)
+    if not Interval.tolist():
+        return j-1
+    else:
+        return j
 
 def isLeftTurn(C, i):
     """
