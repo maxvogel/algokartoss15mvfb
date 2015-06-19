@@ -9,4 +9,4 @@ The algorithm is implemented in `python2`(!) and utilizes a few third party pack
 * `networkx`
 
 Usage:
-`python[2] simp.py MaxEdgesToKeep LineInputFilePath PointInputFilePath OutputFilePath` 
+`python[2] simp.py [--plot] MaxEdgesToKeep LineInputFilePath PointInputFilePath OutputFilePath` 
