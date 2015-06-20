@@ -129,9 +129,12 @@ def computeShortcutsForPolygonalChain2(C,P,epsilon):
   shortcuts = []
   for i in range(0,len(C)-1):
     j = determineSubchain(C,i)
+    #if j-i > 2: print i,j
     subchain = C[0:j+1]
     w_max, w_min, f, f_minmax = computeTangentSplitters(subchain,i)
-    distributedPoints, representatives = distributePoints(f,i,P,subchain,w_max,w_min)
+    Pextended = C[j+1:]
+    Pextended += P
+    distributedPoints, representatives = distributePoints(f,i,Pextended,subchain,w_max,w_min)
 
     Si = subdivision(f,representatives,f_minmax)
 
@@ -224,6 +227,7 @@ def simplifyChain(C, points, epsilon):
 
     xMonotoneSubC = xMonotoneSubchains(rotatedC)
     shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, epsilon)
+    #shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
 
     G = transformToGraph(rotatedC,shortcuts)
     s = getShortestPaths(rotatedC,G)

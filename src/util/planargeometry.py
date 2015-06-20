@@ -7,7 +7,7 @@ def angle(vec1, vec2):
     dotp  = np.dot(vec1,vec2)
     norm_v1 = np.linalg.norm(vec1)
     norm_v2 = np.linalg.norm(vec2)
-    return math.acos(dotp/(norm_v1*norm_v2))
+    return math.acos(round(dotp/(norm_v1*norm_v2),10))
 
 def intersectionPoint(a,b,c,d):
     """

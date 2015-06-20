@@ -5,28 +5,34 @@ from util.planargeometry import *
 def isValid(C,i,j):
     a1 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j+1][0]-C[j][0],C[j+1][1]-C[j][1]])
     a2 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j-1][0]-C[j][0],C[j-1][1]-C[j][1]])
-    return (a1 < a2 and a2 < math.pi) or (math.pi < a2 and a2 < a1)
+    if a2 < a1 and a1 < math.pi:
+        return True
+    else:
+        return math.pi < a1 and a1 < a2
 
-def diminishInterval(I,j):
+def diminishInterval(C,i,I,j):
     for angle in I:
-        halfline = [[0,0], [10**6*math.cos(angle), 10**6*math.sin(angle)]]
-        if intersects(C[j-1],C[j],halfline[0],halfline[1]):
+        halfline = [C[i], [10**6*math.cos(angle), 10**6*math.sin(angle)]]
+        if intersect(C[j-1],C[j],halfline[0],halfline[1]):
             I.remove(angle)
     return I
 
 def determineSubchain(C,i):
-    j = i+1
-    Interval = np.linspace(-math.pi, math.pi, 500, endpoint=False)
+    if i >= len(C)-3:
+        return len(C)-1
+    j = i+2
+    Interval = np.linspace(-math.pi, math.pi, 500)
+    Interval = Interval.tolist()
     vivj = [C[j][0]- C[i][0],C[j][1]- C[i][1]]
     angle_vivj = angle([1,0], vivj)
 
     if angle_vivj in Interval:
-        Inverval.tolist().remove(angle_vivj)
+        Interval.remove(angle_vivj)
 
-    while j < len(C) and isValid(C,i,j) and Interval.tolist():
+    while j < len(C)-2 and isValid(C,i,j) and Interval:
         j +=1
-        diminishInterval(Interval, j)
-    if not Interval.tolist():
+        I = diminishInterval(C, i, Interval, j)
+    if not Interval:
         return j-1
     else:
         return j
