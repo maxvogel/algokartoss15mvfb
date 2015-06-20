@@ -7,6 +7,7 @@ The algorithm is implemented in `python2`(!) and utilizes a few third party pack
 * `shapely`
 * `osgeo` (via gdal)
 * `networkx`
+* `matplotlib` for plotting.
 
 Usage:
 `python[2] simp.py [--plot] MaxEdgesToKeep LineInputFilePath PointInputFilePath OutputFilePath` 
