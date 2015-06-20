@@ -200,11 +200,24 @@ def computeSimplifiedChain(C,P,epsilon):
     sp = getSimplifiedPolygonalChain(C,s)
     return sp
 
+def addConstraintPointsFromChain(C, xMonotoneSubchain):
+    from_ = C.index(xMonotoneSubchain[0])
+    to_   = C.index(xMonotoneSubchain[-1])
 
-def computeShortcutsForArbitraryChain(xMonotoneSubChains, P, epsilon):
+    if len(C) == len(xMonotoneSubchain):
+        return []
+    elif from_ == 0:
+        return C[to_:]
+    elif to_ == len(C)-1:
+        return C[0:from_+1]
+    else:
+        return C[:from_+1] + C[to_:]
+
+def computeShortcutsForArbitraryChain(xMonotoneSubChains,C, P, epsilon):
     shortcuts = []
     for chain in xMonotoneSubChains:
         if len(chain) > 1:
+            P += addConstraintPointsFromChain(C,chain)
             shortcuts += computeShortcutsForPolygonalChain(chain,P,epsilon)
 
     return shortcuts
@@ -226,7 +239,7 @@ def simplifyChain(C, points, epsilon):
     rotatedC, rotatedP = preprocess(C, points)
 
     xMonotoneSubC = xMonotoneSubchains(rotatedC)
-    shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, epsilon)
+    shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon)
     #shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
 
     G = transformToGraph(rotatedC,shortcuts)
@@ -243,7 +256,7 @@ def simplify(polygonalChains, points, epsilon):
         rotatedC, rotatedP = preprocess(C, points)
 
         xMonotoneSubC = xMonotoneSubchains(rotatedC)
-        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC,rotatedP, epsilon))
+        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon))
 
 
         G = transformToGraph(rotatedC,shortcuts[-1])
