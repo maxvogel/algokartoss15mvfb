@@ -2,13 +2,13 @@ import math
 import numpy as np
 from util.planargeometry import *
 
-def isValid(C,i,j):
+def isBackwardTangent(C,i,j):
     a1 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j+1][0]-C[j][0],C[j+1][1]-C[j][1]])
     a2 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j-1][0]-C[j][0],C[j-1][1]-C[j][1]])
-    if a2 < a1 and a1 < math.pi:
+    if a1 < a2 and a2 < math.pi:
         return True
     else:
-        return math.pi < a1 and a1 < a2
+        return math.pi < a2 and a2 < a1
 
 def diminishInterval(C,i,I,j):
     for angle in I:
@@ -29,7 +29,7 @@ def determineSubchain(C,i):
     if angle_vivj in Interval:
         Interval.remove(angle_vivj)
 
-    while j < len(C)-2 and isValid(C,i,j) and Interval:
+    while j < len(C)-2 and not isBackwardTangent(C,i,j) and Interval:
         j +=1
         I = diminishInterval(C, i, Interval, j)
     if not Interval:

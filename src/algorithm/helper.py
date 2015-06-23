@@ -131,6 +131,7 @@ def computeShortcutsForPolygonalChain2(C,P,epsilon):
     j = determineSubchain(C,i)
     #if j-i > 2: print i,j
     subchain = C[0:j+1]
+    P += addConstraintPointsFromChain(C,subchain)
     w_max, w_min, f, f_minmax = computeTangentSplitters(subchain,i)
     Pextended = C[j+1:]
     Pextended += P
@@ -238,9 +239,9 @@ def preprocess(C, points):
 def simplifyChain(C, points, epsilon):
     rotatedC, rotatedP = preprocess(C, points)
 
-    xMonotoneSubC = xMonotoneSubchains(rotatedC)
-    shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon)
-    #shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
+    #xMonotoneSubC = xMonotoneSubchains(rotatedC)
+    #shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon)
+    shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
 
     G = transformToGraph(rotatedC,shortcuts)
     s = getShortestPaths(rotatedC,G)
