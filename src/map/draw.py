@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
 import matplotlib as mpl
+from matplotlib import collections  as mc
 
 
 def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
@@ -26,8 +27,7 @@ def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
                 arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0')
             )
 
-
-    #plt.show()
+    plt.tight_layout()
 
 
 def plotSimplifiedAndOriginal(gml, gmlSimplified):
@@ -50,3 +50,41 @@ def plotSimplifiedAndOriginal(gml, gmlSimplified):
     plt.tight_layout()
 
     plt.show()
+
+
+def plotChain(C, color, width):
+    plt.plot(zip(*C)[0],zip(*C)[1],color,linewidth=width)
+
+import time
+fig = plt.figure()
+plt.ion()
+
+def animate(C, points, shortcuts, shortestPath):
+    ax = fig.add_subplot(111)
+    plt.xticks([]); plt.yticks([]);
+
+    plotChain(C,'b', 1)
+    xmin, xmax = ax.get_xlim()
+    ymin, ymax = ax.get_ylim()
+    plt.scatter(zip(*points)[0], zip(*points)[1])
+
+    if shortcuts:
+        for s in shortcuts:
+            x = []; y = []
+            x.append(zip(*s)[0][0]); x.append(zip(*s)[0][1]); x.append(None)
+            y.append(zip(*s)[1][0]); y.append(zip(*s)[1][1]); y.append(None)
+
+            plt.plot(x,y,'b')
+            axes = plt.gca()
+            axes.set_xlim([xmin,xmax])
+            axes.set_ylim([ymin,ymax])
+
+            plt.draw()
+            time.sleep(0.05)
+            plt.pause(0.0001)
+
+        shortestC = [C[i] for i in shortestPath]
+        plotChain(shortestC,'r', 5)
+        plt.pause(0.001)
+
+        plt.clf()

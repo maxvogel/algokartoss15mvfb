@@ -4,7 +4,7 @@ from distributepoints import *
 from discard_accept import *
 from arbitrarychains import *
 import math
-
+from map.draw import *
 
 def angle(vec1, vec2):
     dotp  = np.dot(vec1,vec2)
@@ -241,10 +241,14 @@ def simplifyChain(C, points, epsilon):
 
     #xMonotoneSubC = xMonotoneSubchains(rotatedC)
     #shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon)
+
+    rP = list(rotatedP)
     shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
 
     G = transformToGraph(rotatedC,shortcuts)
     s = getShortestPaths(rotatedC,G)
+
+    animate(rotatedC,rP,shortcuts,s)
 
     return getSimplifiedPolygonalChain(C,s)
 
