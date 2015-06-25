@@ -4,7 +4,6 @@ from matplotlib.collections import PolyCollection
 import matplotlib as mpl
 from matplotlib import collections  as mc
 
-
 def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
     for i in range(0,len(linesX)):
         plt.plot(linesX[i][1:], linesY[i][1:])
@@ -31,6 +30,7 @@ def drawMap(linesX, linesY, pointsX, pointsY, index, annotate):
 
 
 def plotSimplifiedAndOriginal(gml, gmlSimplified):
+    fig = plt.figure(1)
 
     plt.subplot(1, 2, 1)
     plt.xticks(()); plt.yticks(())
@@ -56,14 +56,15 @@ def plotChain(C, color, width):
     plt.plot(zip(*C)[0],zip(*C)[1],color,linewidth=width)
 
 import time
-fig = plt.figure()
-plt.ion()
+fig = plt.figure(0)
 
 def animate(C, points, shortcuts, shortestPath):
+    # plt.ion()
+
     ax = fig.add_subplot(111)
     plt.xticks([]); plt.yticks([]);
 
-    plotChain(C,'b', 1)
+    plotChain(C,'b', 2)
     xmin, xmax = ax.get_xlim()
     ymin, ymax = ax.get_ylim()
     plt.scatter(zip(*points)[0], zip(*points)[1])
@@ -74,7 +75,7 @@ def animate(C, points, shortcuts, shortestPath):
             x.append(zip(*s)[0][0]); x.append(zip(*s)[0][1]); x.append(None)
             y.append(zip(*s)[1][0]); y.append(zip(*s)[1][1]); y.append(None)
 
-            plt.plot(x,y,'b')
+            plt.plot(x,y,'g')
             axes = plt.gca()
             axes.set_xlim([xmin,xmax])
             axes.set_ylim([ymin,ymax])

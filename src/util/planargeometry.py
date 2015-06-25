@@ -20,7 +20,12 @@ def intersectionPoint(a,b,c,d):
     -------
     intersection point of line ab and cd
     """
-    a = map(float,a)
+    a = map(float,a); b = map(float,b)
+
+    if a == d:
+        return a
+    elif b == c:
+        return b
 
     Sx = ((a[x]*b[y]-a[y]*b[x])*(c[x]-d[x])-(a[x]-b[x])*(c[x]*d[y]-c[y]*d[x]))/ \
     ((a[x]-b[x])*(c[y]-d[y])-(a[y]-b[y])*(c[x]-d[x]))
