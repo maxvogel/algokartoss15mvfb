@@ -93,6 +93,7 @@ def computeTangentSplitters(C,i):
     """
     w_max = []
     w_min = []
+    h = {}
     face = []
     minmax = []
     v_y = 0
@@ -106,15 +107,15 @@ def computeTangentSplitters(C,i):
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
                 k = k-1
                 if minMaxTangent(C,i,k) == 1:
-                    pass         #TODO
-                else:
-                    pass
+                    k = h[k]
+
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
 
             #face.append([interP] + C[k:v_y+1])
             face.append([interP] + buildface(C,k,v_y,w_max))
             w_max.append([C[j], interP])
             minmax.append("max")
+            h[j] = k
 
         elif minMaxTangent(C,i,j) == 0:
             v_y = j
@@ -123,14 +124,14 @@ def computeTangentSplitters(C,i):
             while not intersect(lij[0],lij[1],C[k-1],C[k]):
                 k = k-1
                 if minMaxTangent(C,i,k) == 0:
-                    pass         #TODO
-                else:
-                    pass
+                    k = h[k]
+
             interP = intersectionPoint(lij[0],lij[1],C[k-1],C[k])
 
             #face.append([interP] + C[k:v_y+1])
             face.append([interP] + buildface(C,k,v_y,w_min))
             w_min.append([C[j], interP])
             minmax.append("min")
+            h[j] = k
 
     return w_max, w_min, face, minmax
