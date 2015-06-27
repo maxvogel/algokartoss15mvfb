@@ -185,13 +185,6 @@ def getSimplifiedPolygonalChain(C,path):
     """
     return [C[p] for p in path]
 
-def computeSimplifiedChain(C,P,epsilon):
-    shortcuts = computeShortcutsForPolygonalChain(C,P,epsilon)
-    G = transformToGraph(C,shortcuts)
-    s = getShortestPaths(C,G)
-    sp = getSimplifiedPolygonalChain(C,s)
-    return sp
-
 def addConstraintPointsFromChain(C, xMonotoneSubchain):
     from_ = C.index(xMonotoneSubchain[0])
     to_   = C.index(xMonotoneSubchain[-1])
@@ -211,7 +204,6 @@ def computeShortcutsForArbitraryChain(xMonotoneSubChains,C, P, epsilon):
         if len(chain) > 1:
             P += addConstraintPointsFromChain(C,chain)
             shortcuts += computeShortcutsForPolygonalChain(chain,P,epsilon)
-
     return shortcuts
 
 
@@ -243,7 +235,6 @@ def simplifyChain(C, points, epsilon, anim_flag):
         animate(rotatedC,rP,shortcuts,s)
 
     return getSimplifiedPolygonalChain(C,s)
-
 
 def simplify(polygonalChains, points, epsilon):
     shortcuts = []
