@@ -5,13 +5,8 @@ from util.planargeometry import *
 import Queue
 
 def distributePoints(Si, i, P, C, w_max, w_min):
-	#print(P)
 	Pdash = [p for p in P if p[0] > C[i][0]]
-	#print(Pdash)
 	Pdash += C[i+1:]
-	#print(Pdash)
-	#for p in Pdash:
-	#	print(angle([C[i][0],C[i][1]+1],p))
 	Pdash.sort(key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 	#print("the queue for the point {0} is:\t{1}".format(C[i],Pdash))
 	#T binary search tree
@@ -40,53 +35,31 @@ def distributePoints(Si, i, P, C, w_max, w_min):
 	filteredPoints = [[] for p in Si]
 	trackedPoints = []
 	for face in Si:
-		#print face, isMinFace(face, w_min)
 		for p in range(0,len(face)-1):
 			if not face[p] in trackedPoints and face[p] in C:
 				trackedPoints += [face[p]]
-				#print(trackedPoints)
 				if len(distributedPoints[C.index(face[p])]) > 0:
 					for o in distributedPoints[C.index(face[p])]:
-						#print o, angle([C[i][0],C[i][1]+10],[o[0]-C[i][0],o[1]-C[i][1]])
 						if not filteredPoints[Si.index(face)]:
 							filteredPoints[Si.index(face)] = o
-						elif isMinFace(face,w_min):
+						elif isFaceOrientation(face,w_min):
 							filteredPoints[Si.index(face)] = min(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
-						elif isMaxFace(face,w_max):
+						elif isFaceOrientation(face,w_max):
 							filteredPoints[Si.index(face)] = max(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 						else:
 							print("face has neither min or max orientation")
-	#print("----------------------------")
 		#print("face {} with point {}".format(Si.index(face),filteredPoints[Si.index(face)]))
+	#print("----------------------------")
 	return distributedPoints, filteredPoints
 
-def isMaxFace(face,w_max):
-	for line in w_max:
-		if line[0] in face and line[1] in face:
-			return True
-	return False
-
-def isMinFace(face,w_min):
-	for line in w_min:
+def isFaceOrientation(face,w):
+	for line in w:
 		if line[0] in face and line[1] in face:
 			return True
 	return False
 
 def getSweepLine(Ci,p):
 	return [Ci,[Ci[0]+100*(p[0]-Ci[0]),Ci[1]+100*(p[1]-Ci[1])]]
-
-def dotProduct(a,b):
-	line = [a[1][0]-a[0][0],a[1][1]-a[0][1]]
-	point = [b[0]-a[0][0],b[1]-a[0][1]]
-	return line[0]*point[1]-line[1]*point[0]
-
-def debugPoints(p):
-	lO = [[37,28],[10,7],[51,19]]
-	lTw = [[37,28],[70,-7],[40,-7]]
-	lTh = [[87,13],[20,8],[53,-5],[59,-7]]
-	if p in lTh:
-		return True
-	return False
 
 def findLeftMostEdgeRightOfP(T,p,Ci):
 	sweepline = getSweepLine(Ci,p)
@@ -102,18 +75,12 @@ def findLeftMostEdgeRightOfP(T,p,Ci):
 		if intersect(sweepline[0],sweepline[1],T[i][0],T[i][1]):
 			intersection = intersectionPoint(sweepline[0],sweepline[1],T[i][0],T[i][1])
 			#print("\tintersectionPoint:\t{0}".format(intersection))
-			#print(int(intersection[0]) == sweepline[0][0])
-			#print(int(intersection[1]) == sweepline[0][1])
 			if intersection[0] > p[0]:
-				#if not int(intersection[0]) == Ci[0] and not int(intersection[1]) == Ci[1]:
 				#print("returning edge:\t{0}".format(T[i]))
 				found = True
 				result = T[i]
 		else:
 			#print("\tremoving edge from T:\t{0}".format(T[i]))
-			#if T[i] == [[70, 10], [75, -2]]: 
-			#	foo = 2
-			#else:
 			toDelete.append(T[i])
 		i+=1
 	for e in toDelete:
