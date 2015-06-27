@@ -4,6 +4,15 @@ import math
 x = 0; y = 1
 
 def angle(vec1, vec2):
+    """
+    Parameters
+    ----------
+    vec1, vec2 : two 2D vectors (i.e. two list with two elements each)
+
+    Returns
+    -------
+    The angle between the vectors measured counterclockwise
+    """
     dotp  = np.dot(vec1,vec2)
     norm_v1 = np.linalg.norm(vec1)
     norm_v2 = np.linalg.norm(vec2)
@@ -63,9 +72,17 @@ def intersect(a,b,c,d):
            counterClockwise(a,b,c) != counterClockwise(a,b,d)) or \
            between(a,b,c) or between(a,b,d)
 
-
-
-def distancePointLine(C,line, p):
+def distancePointLine(line, p):
+    """
+    Parameters
+    ----------
+    line : two list of two each elements each defining a line in a 2D space
+    p : a list of two values defining a point
+    
+    Returns
+    -------
+    The distance between the given line `line`and the given point `p`
+    """
     y = (line[1][1]-line[0][1])
     x = (line[1][0]-line[0][0])
     distance = abs(y*p[0] - x*p[1] + line[1][0]*line[0][1] - line[1][1]*line[0][0])

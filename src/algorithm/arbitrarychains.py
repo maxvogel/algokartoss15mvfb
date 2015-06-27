@@ -3,6 +3,19 @@ import numpy as np
 from util.planargeometry import *
 
 def isBackwardTangent(C,i,j):
+    """
+    Determines whether a shortcut/tangent is a backward tangent
+
+    Parameters
+    ----------
+    C : list of points defining the polygonal chain
+    i : the index of whose point in the polygonal chain the longest subchain is wanted
+    j : the index specifying the tanged together with i
+
+    Returns
+    -------
+    a boolean indicating wether it is an backward tangent or not.
+    """
     a1 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j+1][0]-C[j][0],C[j+1][1]-C[j][1]])
     a2 = angle([C[i][0]-C[j][0],C[i][1]-C[j][1]],[C[j-1][0]-C[j][0],C[j-1][1]-C[j][1]])
     if a1 < a2 and a2 < math.pi:
@@ -11,6 +24,9 @@ def isBackwardTangent(C,i,j):
         return math.pi < a2 and a2 < a1
 
 def diminishInterval(C,i,I,j):
+    """
+    helper method for determineSubchain.
+    """
     for angle in I:
         halfline = [C[i], [10**6*math.cos(angle), 10**6*math.sin(angle)]]
         if intersect(C[j-1],C[j],halfline[0],halfline[1]):
@@ -18,6 +34,18 @@ def diminishInterval(C,i,I,j):
     return I
 
 def determineSubchain(C,i):
+    """
+    Method `determineSubchain` as described in the paper. Probably not working entirely correct.
+
+    Parameters
+    ----------
+    C : list of points defining the polygonal chain
+    i : the index of whose point in the polygonal chain the longest subchain is wanted
+
+    Returns
+    -------
+    The index of the point in C at which the subchain starting at i ends.
+    """
     if i >= len(C)-3:
         return len(C)-1
     j = i+2

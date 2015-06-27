@@ -3,16 +3,21 @@ from tangentsegment import *
 from distributepoints import *
 from discard_accept import *
 from arbitrarychains import *
+from util.planargeometry import angle
 import math
 from map.draw import *
 
-def angle(vec1, vec2):
-    dotp  = np.dot(vec1,vec2)
-    norm_v1 = np.linalg.norm(vec1)
-    norm_v2 = np.linalg.norm(vec2)
-    return math.acos(dotp/(norm_v1*norm_v2))
-
 def translate(C, t):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates defining the polygonal chain
+    t : a numpy array 
+
+    Returns
+    -------
+    the translated polygonal chain
+    """
     return [np.array(vertex) + t for vertex in C]
 
 def getPrincipalAngle(C):
@@ -60,13 +65,35 @@ def rotate(C, angle):
 
 
 def subdivision(faces, representatives, f_minmax):
+    """
+    Parameters
+    ----------
+    faces : list of list of points defining the faces
+    representatives : a list of points where one corresponds to a face
+    f_minmax : a list of strings where one corresponds to a face specifying whether its a min a or max face
+    
+    Returns
+    -------
+    a proper subdivision as a list of face objects
+    """
     return [face(faces[i],representatives[i], f_minmax[i]) for i in range(len(faces))]
 
 def shortcutInEpsilonCorridor(C,shortcut,epsilon):
+    """
+    Parameters
+    ----------
+    C : list of points defining the polygonal chain
+    shortcut : list of points defining the shortcut
+    epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
+
+    Returns
+    -------
+    Boolean stating whether the shortcut lies within the epslion corridor or not
+    """
     startIdx = C.index(shortcut[0])
     endIdx = C.index(shortcut[1])
     for i in range(startIdx+1,endIdx):
-        dist = distancePointLine(C,shortcut,C[i])
+        dist = distancePointLine(shortcut,C[i])
         if (dist > epsilon): return False
     return True
 
@@ -78,7 +105,7 @@ def computeShortcutsForPolygonalChain(C,P,epsilon):
 
     Parameters
     ----------
-    C : list of points defining the the polygonal chain
+    C : list of points defining the polygonal chain
     P : list of points constraining the number of consistent shortcuts
     epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
 
@@ -108,7 +135,7 @@ def computeShortcutsForPolygonalChain2(C,P,epsilon):
 
     Parameters
     ----------
-    C : list of points defining the the polygonal chain
+    C : list of points defining the polygonal chain
     P : list of points constraining the number of consistent shortcuts
     epsilon : maximum allowed distance between a shortcut and the points from the polygonal chain
 
@@ -186,6 +213,18 @@ def getSimplifiedPolygonalChain(C,path):
     return [C[p] for p in path]
 
 def addConstraintPointsFromChain(C, xMonotoneSubchain):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal chain with n vertices    
+    xMonotoneSubChains : list of list of x/y coordinates
+        list of subchain which make up the polygonal chain C
+
+    Returns
+    -------
+    a list of points which consists of C without xMonotoneSubchain
+    """
     from_ = C.index(xMonotoneSubchain[0])
     to_   = C.index(xMonotoneSubchain[-1])
 
@@ -199,6 +238,22 @@ def addConstraintPointsFromChain(C, xMonotoneSubchain):
         return C[:from_+1] + C[to_:]
 
 def computeShortcutsForArbitraryChain(xMonotoneSubChains,C, P, epsilon):
+    """
+    Parameters
+    ----------
+    xMonotoneSubChains : list of list of x/y coordinates
+        list of subchain which make up the polygonal chain C
+    C : list of x/y coordinates
+        polygonal chain with n vertices
+    points : list of x/y coordinates
+        points constraining the degree of the simplification
+    epsilon : float
+        shortcuts of the simplification have to lie within the specified epsilon corridor
+
+    Returns
+    -------
+    the simplified polygonal chain
+    """
     shortcuts = []
     for chain in xMonotoneSubChains:
         if len(chain) > 1:
@@ -208,6 +263,18 @@ def computeShortcutsForArbitraryChain(xMonotoneSubChains,C, P, epsilon):
 
 
 def preprocess(C, points):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal chain with n vertices
+    points : list of x/y coordinates
+        points constraining the degree of the simplification
+
+    Returns
+    -------
+    the input parameters, but translated to the view/axis of C[0]
+    """
     t = -np.array(C[0])
 
     translatedC = translate(C,t)
@@ -220,6 +287,22 @@ def preprocess(C, points):
     return map(list, rotatedC), map(list,rotatedP)
 
 def simplifyChain(C, points, epsilon, anim_flag):
+    """
+    Parameters
+    ----------
+    C : list of x/y coordinates
+        polygonal chain with n vertices
+    points : list of x/y coordinates
+        points constraining the degree of the simplification
+    epsilon : float
+        shortcuts of the simplification have to lie within the specified epsilon corridor
+    anim_flag : bool
+        true, if the simplification of the polygonal chain should be animated
+
+    Returns
+    -------
+    the simplified polygonal chain
+    """
     rotatedC, rotatedP = preprocess(C, points)
 
     #xMonotoneSubC = xMonotoneSubchains(rotatedC)
@@ -235,21 +318,3 @@ def simplifyChain(C, points, epsilon, anim_flag):
         animate(rotatedC,rP,shortcuts,s)
 
     return getSimplifiedPolygonalChain(C,s)
-
-def simplify(polygonalChains, points, epsilon):
-    shortcuts = []
-    simplifiedC = []
-    for chain in polygonalChains:
-        #C = map(list, chain[1:][0])
-        rotatedC, rotatedP = preprocess(C, points)
-
-        xMonotoneSubC = xMonotoneSubchains(rotatedC)
-        shortcuts.append(computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon))
-
-
-        G = transformToGraph(rotatedC,shortcuts[-1])
-        s = getShortestPaths(rotatedC,G)
-
-        simplifiedC.append(getSimplifiedPolygonalChain(C,s))
-
-    return simplifiedC
