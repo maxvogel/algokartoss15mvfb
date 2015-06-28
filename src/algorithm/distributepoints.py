@@ -1,8 +1,4 @@
-import math
-import numpy as np
-from tangentsegment import angle, intersect
 from util.planargeometry import *
-import Queue
 
 def distributePoints(Si, i, P, C, w_max, w_min):
 	Pdash = [p for p in P if p[0] > C[i][0]]
@@ -34,21 +30,22 @@ def distributePoints(Si, i, P, C, w_max, w_min):
 				#print("attaching point {0} to edge {1}".format(p,e))
 	filteredPoints = [[] for p in Si]
 	trackedPoints = []
-	for face in Si:
+	for l in range(0,len(Si)):
+		face = Si[l]
 		for p in range(0,len(face)-1):
 			if not face[p] in trackedPoints and face[p] in C:
 				trackedPoints += [face[p]]
 				if len(distributedPoints[C.index(face[p])]) > 0:
 					for o in distributedPoints[C.index(face[p])]:
-						if not filteredPoints[Si.index(face)]:
-							filteredPoints[Si.index(face)] = o
+						if not filteredPoints[l]:
+							filteredPoints[l] = o
 						elif isFaceOrientation(face,w_min):
-							filteredPoints[Si.index(face)] = min(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
+							filteredPoints[l] = min(o,filteredPoints[l], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 						elif isFaceOrientation(face,w_max):
-							filteredPoints[Si.index(face)] = max(o,filteredPoints[Si.index(face)], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
+							filteredPoints[l] = max(o,filteredPoints[l], key=lambda x: angle([0,1],[x[0]-C[i][0],x[1]-C[i][1]]))
 						else:
 							print("face has neither min or max orientation")
-		#print("face {} with point {}".format(Si.index(face),filteredPoints[Si.index(face)]))
+		#print("face {} with point {}".format(l,filteredPoints[l]))
 	#print("----------------------------")
 	return distributedPoints, filteredPoints
 
