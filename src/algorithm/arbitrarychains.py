@@ -27,10 +27,13 @@ def diminishInterval(C,i,I,j):
     """
     helper method for determineSubchain.
     """
+    intersectionFound = False
     for angle in I:
         halfline = [C[i], [10**6*math.cos(angle), 10**6*math.sin(angle)]]
         if intersect(C[j-1],C[j],halfline[0],halfline[1]):
             I.remove(angle)
+            intersectionFound = True
+        elif intersectionFound: break
     return I
 
 def determineSubchain(C,i):
@@ -49,7 +52,8 @@ def determineSubchain(C,i):
     if i >= len(C)-3:
         return len(C)-1
     j = i+2
-    Interval = np.linspace(-math.pi, math.pi, 500)
+    numAngles = len(C) - i
+    Interval = np.linspace(-math.pi, math.pi, numAngles)
     Interval = Interval.tolist()
     vivj = [C[j][0]- C[i][0],C[j][1]- C[i][1]]
     angle_vivj = angle([1,0], vivj)
