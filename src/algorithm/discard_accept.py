@@ -25,10 +25,18 @@ def discard_and_accept(C, Si, i):
     """
     Parameters
     ----------
+    C : list of x/y coordinates
+        polygonal chain
+    Si : list of faces (object)
+         subdivision
+    i : int
+        vertex vi
 
 
     Returns
     -------
+    shortcuts starting at i that
+    are consistent
 
     """
     accept = []

@@ -1,4 +1,15 @@
 class face(object):
+    """
+    Attributes
+    ----------
+    C : list of x/y coordinates
+        polygonal chain
+    p : bool
+        true if a point is associated with this face
+    minimax: string
+             'max' for maximal face
+             'min' for minimal face
+    """
     def __init__(self, C, p, minmax):
         self.C = C  #polygonal chain
         self.p = p
@@ -6,8 +17,10 @@ class face(object):
 
     def pointStored(self):
         """
-        if there's a point associated with
-        a face, return true
+        Returns
+        -------
+        true if there's a point associated with
+        this face
         """
         return self.p
 
