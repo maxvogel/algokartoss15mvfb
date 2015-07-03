@@ -148,19 +148,19 @@ def computeShortcutsForPolygonalChain2(C,P,epsilon):
     for i in range(0,len(C)-1):
         j = determineSubchain(C,i)
         #if j-i > 2: print i,j
-        subchain = C[0:j+1]
+        subchain = C[i:j+1]
         P += addConstraintPointsFromChain(C,subchain)
-        w_max, w_min, f, f_minmax = computeTangentSplitters(subchain,i)
-        Pextended = C[j+1:]
-        Pextended += P
-        distributedPoints, representatives = distributePoints(f,i,Pextended,subchain,w_max,w_min)
+        w_max, w_min, f, f_minmax = computeTangentSplitters(subchain,0)
+        #Pextended = C[j+1:]
+        Pextended = P
+        distributedPoints, representatives = distributePoints(f,0,Pextended,subchain,w_max,w_min)
 
         Si = subdivision(f,representatives,f_minmax)
 
         if not epsilon is None:
-            shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, i) if shortcutInEpsilonCorridor(subchain,shortcut,epsilon)]
+            shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, 0) if shortcutInEpsilonCorridor(subchain,shortcut,epsilon)]
         else:
-            shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, i)]
+            shortcuts += [shortcut for shortcut in discard_and_accept(subchain, Si, 0)]
     return shortcuts
 
 def transformToGraph(C,shortcuts):
