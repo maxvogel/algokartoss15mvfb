@@ -38,17 +38,21 @@ def runMain(args):
 
     k = int(args[1+plot_flag+anim_flag])
     simplified_chains = []
-
+    num_segments_before = 0
+    num_segments_after = 0
     for idx,pc in polygonalChains:
-
+        num_segments_before += len(pc) - 1
         shortcut = simplifyChain(pc, points, 10**10, anim_flag)
-        if k > 0 and len(shortcut) > k:
+        if k > 0 and len(shortcut)-1 > k:
             print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
             simplified_chains.append((idx,pc))
+            num_segments_after += len(pc) - 1
         else:
-            if k == 0: print("simplified polygonal chain with index {} from {} to {} segments".format(idx,len(pc),len(shortcut)))
+            num_segments_after += len(shortcut) - 1
+            if k == 0: print("simplified polygonal chain with index {} from {} to {} segments".format(idx,len(pc)-1,len(shortcut)-1))
             simplified_chains.append((idx,shortcut))
     writeData(args[4+plot_flag+anim_flag],simplified_chains)
+    print "reduced {} polygonal chains with {} segments to {} segments".format(len(polygonalChains), num_segments_before, num_segments_after)
 
     if plot_flag == 1:
         gmlSimplified = GML()
