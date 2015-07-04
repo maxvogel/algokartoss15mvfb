@@ -1,6 +1,9 @@
 import sys
 import os
 
+#parallel
+from joblib import Parallel, delayed
+
 from algorithm.helper import *
 from parser.gml import GML
 from map.draw import plotSimplifiedAndOriginal
@@ -21,6 +24,20 @@ def writeData(file_simple,polygonal_chains):
             chainStr = [" ".join([str(p) for p in chainFlattened])]
             file.write(base_str.format(chain[0]," ".join(chainStr)))
 
+def processChain(idx,pc,points,k,anim_flag):
+    shortcut = simplifyChain(pc, points, 10**10, anim_flag)
+    num_segments_after = 0
+    if k > 0 and len(shortcut)-1 > k:
+        print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
+        shortcut = (idx,pc)
+        num_segments_after += len(pc) - 1
+    else:
+        num_segments_after += len(shortcut) - 1
+        if k == 0: print("simplified polygonal chain with index {} from {} to {} segments".format(idx,len(pc)-1,len(shortcut)-1))
+        shortcut = (idx,shortcut)
+    return shortcut, len(pc)-1, num_segments_after
+
+
 def runMain(args):
     plot_flag = 0
     anim_flag = 0
@@ -36,21 +53,30 @@ def runMain(args):
     gml, polygonalChains, points = readData(args[2+plot_flag+anim_flag],args[3+plot_flag+anim_flag])
     print "Successfully read lines from file {}, and points from file {}.".format(args[2+plot_flag+anim_flag],args[3+plot_flag+anim_flag])
 
+    polygonalChains.sort(key = lambda (idx,C) : len(C))
+
+    print "longest chain:\t{}".format(len(polygonalChains[-1][1])-1)
+
     k = int(args[1+plot_flag+anim_flag])
     simplified_chains = []
     num_segments_before = 0
     num_segments_after = 0
-    for idx,pc in polygonalChains:
-        num_segments_before += len(pc) - 1
-        shortcut = simplifyChain(pc, points, 10**10, anim_flag)
-        if k > 0 and len(shortcut)-1 > k:
-            print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
-            simplified_chains.append((idx,pc))
-            num_segments_after += len(pc) - 1
-        else:
-            num_segments_after += len(shortcut) - 1
-            if k == 0: print("simplified polygonal chain with index {} from {} to {} segments".format(idx,len(pc)-1,len(shortcut)-1))
-            simplified_chains.append((idx,shortcut))
+    #for idx,pc in polygonalChains:
+    #    num_segments_before += len(pc) - 1
+    #    shortcut = simplifyChain(pc, points, 10**10, anim_flag)
+    #    if k > 0 and len(shortcut)-1 > k:
+    #        print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
+    #        simplified_chains.append((idx,pc))
+    #        num_segments_after += len(pc) - 1
+    #    else:
+    #        num_segments_after += len(shortcut) - 1
+    #        if k == 0: print("simplified polygonal chain with index {} from {} to {} segments".format(idx,len(pc)-1,len(shortcut)-1))
+    #        simplified_chains.append((idx,shortcut))
+    result = Parallel(n_jobs=4)(delayed(processChain)(idx,pc,points,k,anim_flag) for idx,pc in polygonalChains)
+    for shortcut, before, after in result:
+        simplified_chains.append(shortcut)
+        num_segments_before += before
+        num_segments_after += after
     writeData(args[4+plot_flag+anim_flag],simplified_chains)
     print "reduced {} polygonal chains with {} segments to {} segments".format(len(polygonalChains), num_segments_before, num_segments_after)
 
