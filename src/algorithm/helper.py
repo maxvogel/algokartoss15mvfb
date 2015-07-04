@@ -286,7 +286,7 @@ def preprocess(C, points):
     rotatedP = rotate(translatedP,a)
     return map(list, rotatedC), map(list,rotatedP)
 
-def simplifyChain(C, points, epsilon, anim_flag):
+def simplifyChain(C, points, epsilon, xmonotone, anim_flag):
     """
     Parameters
     ----------
@@ -305,11 +305,12 @@ def simplifyChain(C, points, epsilon, anim_flag):
     """
     rotatedC, rotatedP = preprocess(C, points)
 
-    #xMonotoneSubC = xMonotoneSubchains(rotatedC)
-    #shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubC, rotatedC, rotatedP, epsilon)
-
     rP = list(rotatedP)
-    shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
+
+    if xmonotone:
+        shortcuts = computeShortcutsForArbitraryChain(xMonotoneSubchains(rotatedC), rotatedC, rotatedP, epsilon)
+    else:
+        shortcuts = computeShortcutsForPolygonalChain2(rotatedC, rotatedP, epsilon)
 
     G = transformToGraph(rotatedC,shortcuts)
     s = getShortestPaths(rotatedC,G)

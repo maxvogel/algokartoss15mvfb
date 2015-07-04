@@ -42,7 +42,7 @@ def runMain(args):
     num_segments_after = 0
     for idx,pc in polygonalChains:
         num_segments_before += len(pc) - 1
-        shortcut = simplifyChain(pc, points, 10**10, anim_flag)
+        shortcut = simplifyChain(pc, points, 10**10, False, anim_flag)
         if k > 0 and len(shortcut)-1 > k:
             print("ERROR: polygonal chain with index {} could not be simplified".format(idx))
             simplified_chains.append((idx,pc))
