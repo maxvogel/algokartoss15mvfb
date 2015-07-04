@@ -61,8 +61,7 @@ def determineSubchain(C,i):
     if angle_vivj in Interval:
         Interval.remove(angle_vivj)
 
-    limit = min(len(C)-j,100)
-    while j < min(len(C)-2,j+limit) and not isBackwardTangent(C,i,j) and Interval:
+    while j < len(C)-2 and not isBackwardTangent(C,i,j) and Interval:
         j +=1
         I = diminishInterval(C, i, Interval, j)
     if not Interval:
