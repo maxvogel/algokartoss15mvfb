@@ -3,3 +3,5 @@
 *.aux
 *.out
 *.snm
+*.pdf
+*.synctex.gz
