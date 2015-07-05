@@ -82,10 +82,10 @@ def animate(C, points, shortcuts, shortestPath):
 
             plt.draw()
             time.sleep(0.05)
-            plt.pause(0.0001)
+            plt.pause(0.001)
 
         shortestC = [C[i] for i in shortestPath]
         plotChain(shortestC,'r', 5)
-        plt.pause(0.001)
+        plt.pause(0.5)
 
         plt.clf()
